@@ -1,0 +1,32 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.3.30'
+    id 'application'
+}
+
+group 'net.markjfisher'
+version '1.0.0'
+
+defaultTasks(
+        "clean", "build"
+)
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile "net.markjfisher:elderscrolls-legends-sdk-java:1.1.1"
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+application {
+    mainClassName = 'legends.DeckCheck'
+}
