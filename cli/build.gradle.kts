@@ -66,4 +66,5 @@ tasks {
 
 application {
     mainClassName = "legends.DeckCheck"
+    application.applicationName = "deck-check"
 }

@@ -1,4 +1,4 @@
-rootProject.name = "deck-check"
+rootProject.name = "deck-check-app"
 
 include(
     "cli"
