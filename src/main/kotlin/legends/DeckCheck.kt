@@ -2,8 +2,6 @@ package legends
 
 import io.elderscrollslegends.Card
 import io.elderscrollslegends.Deck
-import io.elderscrollslegends.Type
-
 
 class DeckCheck {
     companion object {
@@ -15,11 +13,6 @@ class DeckCheck {
             val importCode = if (args.isEmpty()) code else args[0]
             val deck = Deck.importCode(importCode)
 
-            println("\nSet Types:")
-            deck.cards.groupBy { it.set.name }.forEach { (setName, cardsInSet) ->
-                println("  $setName: ${cardsInSet.size}")
-            }
-
             println("\nRarity:")
             deck.cards
                 .sortedBy { it.name }
@@ -28,7 +21,7 @@ class DeckCheck {
                     println("  $rarity, count: ${cards.size}")
                 }
 
-            Type.all().forEach { type ->
+            listOf("Action", "Item", "Support").forEach { type ->
                 printTypeData(type, deck.cards)
             }
 
@@ -37,6 +30,14 @@ class DeckCheck {
             val c3 = deck.of(3).size
 
             println("\nTotal unique cards: ${c1 + c2 + c3}\nTotal cards: ${c1 + c2 * 2 + c3 * 3}")
+
+            println("\nSet Types:")
+            deck.cards.groupBy { it.set.name }.forEach { (setName, cardsInSet) ->
+                println("  $setName: ${cardsInSet.size}")
+            }
+
+            // Creatures
+            printTypeData("Creature", deck.cards)
 
             // Curve graph
             val costToCountMap = deck.cards
@@ -70,7 +71,7 @@ class DeckCheck {
             val increment = maxValue / 60.0
             val maxLabelLength = 4
 
-            println("\nCost Curve\n")
+            println("\nMana Curve\n")
             data.forEach { (cost, count) ->
                 val barChunks = ((count * 8) / increment).toInt().div(8)
                 val remainder = ((count * 8) / increment).toInt().rem(8)
