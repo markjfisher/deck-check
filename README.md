@@ -2,8 +2,6 @@
 
 A very simple command line application to check card decks out from import codes
 
-Current Version: 
-
 ## example output
 
     ▶ ./deck-check SPACgOsjAAAQfsbSgUgpmToZpqfrfxkpmefqfBjiiuhO
