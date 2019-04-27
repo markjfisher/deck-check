@@ -1,5 +1,9 @@
 rootProject.name = "deck-check"
 
+include(
+    "cli"
+)
+
 val kotlinVersion: String by settings
 val gradleVersionsVersion: String by settings
 

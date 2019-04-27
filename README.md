@@ -2,16 +2,11 @@
 
 A very simple command line application to check card decks out from import codes
 
+Current Version: 
+
 ## example output
 
     ▶ ./deck-check SPACgOsjAAAQfsbSgUgpmToZpqfrfxkpmefqfBjiiuhO
-    
-    Set Types:
-      Return to Clockwork City: 13
-      Houses of Morrowind: 1
-      Core Set: 24
-      Heroes of Skyrim: 6
-      Monthly Rewards: 6
     
     Rarity:
       Common, count: 24
@@ -21,6 +16,21 @@ A very simple command line application to check card decks out from import codes
     
     Action, count: 3
       Edict of Azura, count: 3, [4/-/-], attr: [Willpower, Endurance]
+    
+    Item, count: 0
+    
+    Support, count: 3
+      Halls of the Dwemer, count: 3, [6/-/-], attr: [Neutral]
+    
+    Total unique cards: 18
+    Total cards: 50
+    
+    Set Types:
+      Return to Clockwork City: 13
+      Houses of Morrowind: 1
+      Core Set: 24
+      Heroes of Skyrim: 6
+      Monthly Rewards: 6
     
     Creature, count: 44
       Blackreach Rebuilder, count: 3, [1/0/1], attr: [Neutral]
@@ -40,18 +50,21 @@ A very simple command line application to check card decks out from import codes
       Steam Constructor, count: 3, [2/2/2], attr: [Neutral]
       Yagrum Bagarn, count: 1, [3/2/4], attr: [Neutral]
     
-    Item, count: 0
+    Mana Curve
     
-    Support, count: 3
-      Halls of the Dwemer, count: 3, [6/-/-], attr: [Neutral]
-    
-    total unique cards: 18, total cards: 50
+     0   | 1 ██████████
+     1   | 2 ████████████████████
+     2   | 4 ████████████████████████████████████████
+     3   | 6 ████████████████████████████████████████████████████████████
+     4   | 3 ██████████████████████████████
+     5   | 1 ██████████
+     6   | 1 ██████████
+     7+  | 0 ▏
 
-The outputs mostly show `<Name>, count, [Cost / Power / Health], attributes`
 
 ## Requirements
 
-You need JAVA installed and available on the command line, or JAVA_HOME set as an environment variable.
+You need JAVA (8+) installed and available on the command line, or JAVA_HOME set as an environment variable.
 
 ## Usage from source
 
@@ -74,10 +87,13 @@ You need JAVA installed and available on the command line, or JAVA_HOME set as a
     cd deck-check-1.0.0/bin
     ./bin/deck-check SPAJsIuptdtrtDutsYsUsABBtLtmsvuAsTudsPtjsJsVsWtvsRuntqtHsFsLursQukuqsEtctytauvAEtttAtuts
 
-### windows (unverified)
+### windows from source
 
-Replace all the ./gradlew commands above with gradle.bat in the above, and adjust
+As this is a gradle based application, it should just be a case of replacing
+all the ./gradlew commands above with gradle.bat in the above, and adjust
 the commands for cd/unzip above to windows versions.
+
+I haven't however tried it in windows.
 
 ## Usage from a release zip file
 
@@ -85,9 +101,6 @@ the commands for cd/unzip above to windows versions.
 2. Unzip it to a directory
 3. (on command line) cd into the directory that contains the bin-check.bat file
 4. (on the command line) run:
-    gradlew.bat SPAJsIuptdtrtDutsYsUsABBtLtmsvuAsTudsPtjsJsVsWtvsRuntqtHsFsLursQukuqsEtctytauvAEtttAtuts
-
-## Notes
-
-When you first run the application, it will install gradle to be able to run.
-This is a once only task.
+   ```bash
+   deck-check.bat SPAJsIuptdtrtDutsYsUsABBtLtmsvuAsTudsPtjsJsVsWtvsRuntqtHsFsLursQukuqsEtctytauvAEtttAtuts
+   ```
