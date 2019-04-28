@@ -5,9 +5,6 @@ plugins {
     kotlin("jvm")
 }
 
-group = "net.markjfisher"
-version = "1.0.2"
-
 val elderscrollsLegendsSdkJavaVersion: String by project
 val cliktVersion: String by project
 val kotlinVersion: String by project

@@ -1,5 +1,6 @@
 plugins {
     id("com.github.ben-manes.versions")
+    kotlin("jvm") apply false
 }
 
 tasks {
@@ -19,4 +20,7 @@ allprojects {
         jcenter()
         maven(url = "https://plugins.gradle.org/m2/")
     }
+
+    group = "net.markjfisher"
+    version = "1.1.0"
 }
