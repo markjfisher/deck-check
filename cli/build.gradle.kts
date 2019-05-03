@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.accessors.runtime.conventionPluginByName
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -61,9 +62,67 @@ tasks {
         useJUnitPlatform()
     }
 
+    val deckCheckStartScripts by registering(CreateStartScripts::class) {
+        group = "build"
+        description = "Create run scripts for deck-check"
+        outputDir = file("$buildDir/scripts")
+        applicationName = "deck-check"
+
+        val jarTask = project.tasks.getByName("jar")
+        classpath = jarTask.outputs.files + configurations.getByName("runtime")
+        dependsOn(jarTask)
+
+        doLast {
+            val adc = conventionPluginByName(convention, "application") as ApplicationPluginConvention
+            adc.applicationDistribution.run {
+                println("doing $name")
+                into("bin") {
+                    from(project.tasks[name])
+                    fileMode = Integer.parseUnsignedInt("755", 8)
+                }
+
+            }
+        }
+    }
+
+//    named<Zip>("distZip") {
+//        val adc = conventionPluginByName(project.convention, "application") as ApplicationPluginConvention
+//        adc.applicationDistribution.from(project.tasks.getByName("deckCheckStartScripts")) {
+//            into("bin")
+//        }
+//    }
+
+}
+
+fun createScript(mainClass: String, name: String) {
+    tasks.create(name = name, type = CreateStartScripts::class) {
+        outputDir = file("$buildDir/scripts")
+        mainClassName = mainClass
+        applicationName = name
+        classpath = tasks[JavaPlugin.JAR_TASK_NAME].outputs.files + configurations.getByName("runtime")
+    }
+    // val jarTask = tasks.getByName("jar")
+    tasks[name].dependsOn(tasks.getByName("jar"))
+
+    val adc = conventionPluginByName(convention, "application") as ApplicationPluginConvention
+    adc.applicationDistribution.run {
+        println("doing $name")
+        into("bin") {
+            from(project.tasks[name])
+            fileMode = Integer.parseUnsignedInt("755", 8)
+        }
+
+    }
 }
 
 application {
     mainClassName = "legends.DeckCheck"
     application.applicationName = "deck-check"
 }
+
+// apply(from = "$rootDir/../scripts.gradle.kts")
+//tasks.getByName("startScripts").enabled = false
+//tasks.getByName("run").enabled = false
+
+// createScript(mainClass = "legends.DeckCheck", name = "deck-check")
+// createScript(mainClass = "legends.BotCheck", name = "bot-check")

@@ -68,7 +68,7 @@ class DeckCheck {
         private fun printBarGraph(data: Map<Int, Int>) {
             val maxValue = data.values.max()!!
             val maxValueLength = "$maxValue".length
-            val increment = maxValue / 60.0
+            val increment = maxValue / 20.0
             val maxLabelLength = 4
 
             println("\nMana Curve\n")
