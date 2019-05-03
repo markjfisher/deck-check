@@ -1,7 +1,8 @@
 rootProject.name = "deck-check-app"
 
 include(
-    "cli"
+    "cli",
+    "discordkt"
 )
 
 val kotlinVersion: String by settings
