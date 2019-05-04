@@ -16,6 +16,10 @@ val junitJupiterEngineVersion: String by project
 val assertJVersion: String by project
 val mockkVersion: String by project
 val okHttpVerison: String by project
+val konfigVersion: String by project
+
+// set in ~/.gradle/gradle.properties
+val deckCheckBotToken: String by project
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
@@ -24,6 +28,7 @@ dependencies {
 
     implementation("ch.qos.logback:logback-classic:$logbackClassicVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion")
+    implementation("com.natpryce:konfig:$konfigVersion")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterEngineVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterEngineVersion")
@@ -118,6 +123,7 @@ fun createScript(mainClass: String, name: String) {
 application {
     mainClassName = "legends.DeckCheck"
     application.applicationName = "deck-check"
+    applicationDefaultJvmArgs = listOf("-Ddeck-check.bot.token=$deckCheckBotToken")
 }
 
 // apply(from = "$rootDir/../scripts.gradle.kts")

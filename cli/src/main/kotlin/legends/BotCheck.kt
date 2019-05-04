@@ -1,5 +1,6 @@
 package legends
 
+import com.natpryce.konfig.*
 import io.elderscrollslegends.Card
 import io.elderscrollslegends.Deck
 import io.github.nerd.discordkt.discord.auth.Authentication
@@ -9,10 +10,15 @@ import legends.BotCheck.ClassColour.*
 
 object BotCheck {
 
+    private val token = Key("deck-check.bot.token", stringType)
+
+    private val config = ConfigurationProperties.systemProperties() overriding
+            EnvironmentVariables() overriding
+            ConfigurationProperties.fromResource("defaults.properties")
 
     @JvmStatic
     fun main(args: Array<String>) {
-        val discord = discord(Authentication.bot("NTczNzkwMDM2NzM5NDg5ODIy.XMv_zw.dTaEuRU8ad47GW-l9HZ2VkLGIKI")).get()
+        val discord = discord(Authentication.bot(config[token])).get()
 
         discord.on<MessageRecvEvent> { event ->
             if (event.content.startsWith("!ping", ignoreCase = true)) {
