@@ -13,80 +13,34 @@ class DeckCheck {
             val importCode = if (args.isEmpty()) code else args[0]
             val deck = Deck.importCode(importCode)
 
-            println("\nRarity:")
-            deck.cards
-                .sortedBy { it.name }
-                .groupBy { it.rarity }
-                .forEach { (rarity, cards) ->
-                    println("  $rarity, count: ${cards.size}")
-                }
+            val da = DeckAnalysis(deck)
 
-            listOf("Action", "Item", "Support").forEach { type ->
-                printTypeData(type, deck.cards)
-            }
+            val line1 = String.format("%10s: %-5d   %10s: %-5d", "Common", da.commonCount, "Actions", da.actionsCount)
+            val line2 = String.format("%10s: %-5d   %10s: %-5d", "Rare", da.rareCount, "Items", da.itemsCount)
+            val line3 = String.format("%10s: %-5d   %10s: %-5d", "Epic", da.epicCount, "Support", da.supportsCount)
+            val line4 = String.format("%10s: %-5d   %10s: %-5d", "Legendary", da.legendaryCount, "Creatures", da.creatureCount)
 
-            val c1 = deck.of(1).size
-            val c2 = deck.of(2).size
-            val c3 = deck.of(3).size
+            println("""
+Summary:
+$line1
+$line2
+$line3
+$line4
 
-            println("\nTotal unique cards: ${c1 + c2 + c3}\nTotal cards: ${c1 + c2 * 2 + c3 * 3}")
+Class    : ${da.deckClassName} [${da.attributesText}]
+Keywords : ${da.keywordsText}
 
-            println("\nSet Types:")
-            deck.cards.groupBy { it.set.name }.forEach { (setName, cardsInSet) ->
-                println("  $setName: ${cardsInSet.size}")
-            }
+Unique   : ${da.totalUnique}
+Total    : ${da.totalCards} (1s ${da.c1}, 2s ${da.c2}, 3s ${da.c3})
+
+Mana Curve
+${da.createManaString()}""".trimIndent())
 
             // Creatures
+            printTypeData("Action", deck.cards)
+            printTypeData("Item", deck.cards)
+            printTypeData("Support", deck.cards)
             printTypeData("Creature", deck.cards)
-
-            // Curve graph
-            val costToCountMap = deck.cards
-                .groupBy { it.cost }
-                .toSortedMap()
-                .map { entry ->
-                    val cost = entry.key
-                    val count = entry.value
-                        .groupBy { card -> card.name }
-                        .map { it.value.first() }
-                        .count()
-                    (cost to count)
-                }
-                .toMap()
-
-            val costData = mutableMapOf<Int, Int>()
-            (0..30).forEach { cost ->
-                val x = if (cost < 8) cost else 7
-                val y = costToCountMap[cost] ?: 0
-                val sevenPlus = costData.getOrDefault(7, 0)
-                costData[x] = sevenPlus + y
-            }
-
-            printBarGraph(costData)
-
-        }
-
-        private fun printBarGraph(data: Map<Int, Int>) {
-            val maxValue = data.values.max()!!
-            val maxValueLength = "$maxValue".length
-            val increment = maxValue / 20.0
-            val maxLabelLength = 4
-
-            println("\nMana Curve\n")
-            data.forEach { (cost, count) ->
-                val barChunks = ((count * 8) / increment).toInt().div(8)
-                val remainder = ((count * 8) / increment).toInt().rem(8)
-
-                var bar = "█".repeat(barChunks)
-                if (remainder > 0) {
-                    bar += ('█'.toInt() + (8-remainder)).toChar()
-                }
-                if (bar == "") {
-                    bar = "▏"
-                }
-
-                val costText = if (cost < 7) "$cost" else "7+"
-                println(" ${costText.padEnd(maxLabelLength)}| ${count.toString().padEnd(maxValueLength)} $bar")
-            }
 
         }
 
