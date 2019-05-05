@@ -17,6 +17,7 @@ val assertJVersion: String by project
 val mockkVersion: String by project
 val okHttpVerison: String by project
 val konfigVersion: String by project
+val diskordVersion: String by project
 
 // set in ~/.gradle/gradle.properties
 val deckCheckBotToken: String by project
@@ -37,7 +38,7 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.squareup.okhttp3:okhttp:$okHttpVerison")
 
-    implementation(project(":discordkt"))
+    implementation("com.jessecorbett:diskord:$diskordVersion")
 }
 
 tasks {
