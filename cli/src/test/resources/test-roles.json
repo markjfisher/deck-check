@@ -1,0 +1,164 @@
+{
+  "roles": [
+    {
+      "position": 0,
+      "permissions": 3476545,
+      "name": "@everyone",
+      "mentionable": false,
+      "managed": false,
+      "id": "234920034386968576",
+      "hoist": false,
+      "color": 0
+    },
+    {
+      "position": 9,
+      "permissions": 1408629975,
+      "name": "Ⓜ️Guide Team",
+      "mentionable": true,
+      "managed": false,
+      "id": "268830045617913856",
+      "hoist": true,
+      "color": 3447003
+    },
+    {
+      "position": 14,
+      "permissions": 1408761047,
+      "name": "🚨 Cheif",
+      "mentionable": true,
+      "managed": false,
+      "id": "268831030536962049",
+      "hoist": false,
+      "color": 3447003
+    },
+    {
+      "position": 6,
+      "permissions": 37080129,
+      "name": "🔶 Wildlings",
+      "mentionable": true,
+      "managed": false,
+      "id": "268836839874363402",
+      "hoist": true,
+      "color": 15105570
+    },
+    {
+      "position": 12,
+      "permissions": 334756919,
+      "name": "MEE6",
+      "mentionable": false,
+      "managed": true,
+      "id": "418845764488527872",
+      "hoist": false,
+      "color": 0
+    },
+    {
+      "position": 11,
+      "permissions": 134731840,
+      "name": "Fortnite Stats",
+      "mentionable": false,
+      "managed": true,
+      "id": "422451954761859072",
+      "hoist": false,
+      "color": 0
+    },
+    {
+      "position": 13,
+      "permissions": 805497856,
+      "name": "PatchBot",
+      "mentionable": false,
+      "managed": true,
+      "id": "435986764520357899",
+      "hoist": false,
+      "color": 0
+    },
+    {
+      "position": 7,
+      "permissions": 37211201,
+      "name": "🔆 Elders",
+      "mentionable": true,
+      "managed": false,
+      "id": "437429362246287380",
+      "hoist": true,
+      "color": 16762112
+    },
+    {
+      "position": 8,
+      "permissions": 137694273,
+      "name": "💜 Support Team",
+      "mentionable": false,
+      "managed": true,
+      "id": "471093321251422218",
+      "hoist": true,
+      "color": 10702074
+    },
+    {
+      "position": 5,
+      "permissions": 37092416,
+      "name": "Dank Memer",
+      "mentionable": false,
+      "managed": true,
+      "id": "474349936339582984",
+      "hoist": false,
+      "color": 0
+    },
+    {
+      "position": 4,
+      "permissions": 347200,
+      "name": "GiveawayBot",
+      "mentionable": false,
+      "managed": true,
+      "id": "476105783864590337",
+      "hoist": false,
+      "color": 0
+    },
+    {
+      "position": 3,
+      "permissions": 37145666,
+      "name": "TwitchBot",
+      "mentionable": false,
+      "managed": true,
+      "id": "525840599434133504",
+      "hoist": false,
+      "color": 0
+    },
+    {
+      "position": 2,
+      "permissions": 37080128,
+      "name": "Groovy",
+      "mentionable": false,
+      "managed": true,
+      "id": "525841945478823976",
+      "hoist": false,
+      "color": 0
+    },
+    {
+      "position": 1,
+      "permissions": 411713,
+      "name": "Streamlabs Bot",
+      "mentionable": false,
+      "managed": true,
+      "id": "542733859377119232",
+      "hoist": false,
+      "color": 0
+    },
+    {
+      "position": 1,
+      "permissions": 27904,
+      "name": "Nightbot",
+      "mentionable": false,
+      "managed": true,
+      "id": "546373301606416384",
+      "hoist": false,
+      "color": 0
+    },
+    {
+      "position": 1,
+      "permissions": 0,
+      "name": "Muted",
+      "mentionable": false,
+      "managed": false,
+      "id": "571725516533530624",
+      "hoist": false,
+      "color": 8487814
+    }
+  ]
+}

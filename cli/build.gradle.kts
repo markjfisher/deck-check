@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     application
     kotlin("jvm")
+    id("kotlinx-serialization") version "1.3.30"
 }
 
 val elderscrollsLegendsSdkJavaVersion: String by project
@@ -12,6 +13,7 @@ val kotlinVersion: String by project
 
 val logbackClassicVersion: String by project
 val logbackEncoderVersion: String by project
+val kotlinLoggingVersion: String by project
 val junitJupiterEngineVersion: String by project
 val assertJVersion: String by project
 val mockkVersion: String by project
@@ -29,6 +31,7 @@ dependencies {
 
     implementation("ch.qos.logback:logback-classic:$logbackClassicVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion")
+    implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
     implementation("com.natpryce:konfig:$konfigVersion")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterEngineVersion")

@@ -1,5 +1,6 @@
 package legends
 
+import com.jessecorbett.diskord.api.websocket.events.DiscordEvent.*
 import com.jessecorbett.diskord.dsl.block
 import com.jessecorbett.diskord.dsl.bot
 import com.jessecorbett.diskord.dsl.command
@@ -8,6 +9,11 @@ import com.jessecorbett.diskord.util.mention
 import com.jessecorbett.diskord.util.words
 import com.natpryce.konfig.*
 import io.elderscrollslegends.Deck
+import kotlinx.serialization.json.Json
+import legends.events.TypingStart
+import mu.KotlinLogging
+
+private val logger = KotlinLogging.logger {}
 
 object BotCheck {
 
@@ -19,7 +25,6 @@ object BotCheck {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        //runBlocking {}
         bot(config[token]) {
             commands(prefix = "!") {
                 command(command = "deck") {
@@ -30,10 +35,23 @@ object BotCheck {
                 }
             }
             started {
-                println("started with sessionId: ${it.sessionId}")
+                logger.info{"started with sessionId: ${it.sessionId}"}
             }
-            this.anyEvent { event, json ->
-                println("${event.name} -> $json")
+
+            anyEvent { event, json ->
+                when(event) {
+                    PRESENCE_UPDATE, GUILD_CREATE -> {
+                        logger.info { "${event.name} -> $json" }
+                    }
+                    TYPING_START -> {
+                        logger.info { json }
+                        val typingStart = Json.nonstrict.parse(TypingStart.serializer(), json.toString())
+                        val user = typingStart.member.user
+                        logger.info { "user: ${user.username}, nick: ${typingStart.nick} started typing!"}
+                    }
+
+                    else -> logger.info { "${event.name} -> OMMIT" }
+                }
             }
 
             block()
@@ -71,7 +89,7 @@ object BotCheck {
             return "Please supply a single deck code."
         }
         val deckCode = args[0]
-        println("User: $username asked for info on deck $deckCode")
+        logger.info {"User: $username asked for $type for code: $deckCode"}
         val deck = Deck.importCode(deckCode)
         val da = DeckAnalysis(deck)
 
