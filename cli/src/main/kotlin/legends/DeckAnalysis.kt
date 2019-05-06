@@ -6,9 +6,9 @@ import io.elderscrollslegends.Deck
 import legends.DeckAnalysis.ClassColour.*
 
 class DeckAnalysis(private val deck: Deck) {
-    var byRarity: Map<String, List<Card>>
-    var deckClassName: String
-    var attributesText: String
+    val byRarity: Map<String, List<Card>>
+    val deckClassName: String
+    val attributesText: String
 
     val keywordsText: String
     val legendaryCount: Int
@@ -28,7 +28,7 @@ class DeckAnalysis(private val deck: Deck) {
     val c3: Int
     val totalUnique: Int
     val totalCards: Int
-    var manaToCardCount: Map<Int, Int>
+    val manaToCardCount: Map<Int, Int>
 
     init {
         byRarity = deck.cards

@@ -41,16 +41,15 @@ object BotCheck {
             anyEvent { event, json ->
                 when(event) {
                     PRESENCE_UPDATE, GUILD_CREATE -> {
-                        logger.info { "${event.name} -> $json" }
+                        logger.debug { "${event.name} -> $json" }
                     }
                     TYPING_START -> {
-                        logger.info { json }
                         val typingStart = Json.nonstrict.parse(TypingStart.serializer(), json.toString())
                         val user = typingStart.member.user
-                        logger.info { "user: ${user.username}, nick: ${typingStart.nick} started typing!"}
+                        logger.debug { "user: ${user.username}, nick: ${typingStart.nick} started typing!"}
                     }
 
-                    else -> logger.info { "${event.name} -> OMMIT" }
+                    else -> logger.debug { "${event.name} -> OMMIT" }
                 }
             }
 
@@ -86,8 +85,9 @@ object BotCheck {
         type: String
     ): String {
         if (args.size != 1) {
-            return "Please supply a single deck code."
+            return "$mention: Please supply a single deck code."
         }
+
         val deckCode = args[0]
         logger.info {"User: $username asked for $type for code: $deckCode"}
         val deck = Deck.importCode(deckCode)
