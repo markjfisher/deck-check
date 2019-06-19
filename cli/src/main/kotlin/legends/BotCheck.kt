@@ -8,6 +8,7 @@ import com.jessecorbett.diskord.dsl.commands
 import com.jessecorbett.diskord.util.mention
 import com.jessecorbett.diskord.util.words
 import com.natpryce.konfig.*
+import io.elderscrollslegends.CardCache
 import io.elderscrollslegends.Deck
 import kotlinx.serialization.json.Json
 import legends.events.TypingStart
@@ -25,6 +26,7 @@ object BotCheck {
 
     @JvmStatic
     fun main(args: Array<String>) {
+        CardCache.load()
         bot(config[token]) {
             commands(prefix = "!") {
                 command(command = "deck") {

@@ -16,6 +16,7 @@ defaultTasks(
 
 allprojects {
     repositories {
+        // mavenLocal()
         mavenCentral()
         jcenter()
         maven(url = "https://plugins.gradle.org/m2/")
