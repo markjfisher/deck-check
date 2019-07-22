@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.accessors.runtime.conventionPluginByName
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -20,6 +19,7 @@ val mockkVersion: String by project
 val okHttpVerison: String by project
 val konfigVersion: String by project
 val diskordVersion: String by project
+val easyRulesCoreVersion: String by project
 
 // set in ~/.gradle/gradle.properties
 val deckCheckBotToken: String by project
@@ -34,6 +34,9 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
     implementation("com.natpryce:konfig:$konfigVersion")
 
+    implementation("org.jeasy:easy-rules-core:$easyRulesCoreVersion")
+    implementation("org.jeasy:easy-rules-mvel:$easyRulesCoreVersion")
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterEngineVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterEngineVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterEngineVersion")
@@ -41,7 +44,7 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.squareup.okhttp3:okhttp:$okHttpVerison")
 
-    implementation("com.jessecorbett:diskord:$diskordVersion")
+    implementation("com.jessecorbett:diskord-jvm:$diskordVersion")
 }
 
 tasks {
@@ -71,68 +74,16 @@ tasks {
         useJUnitPlatform()
     }
 
-    val deckCheckStartScripts by registering(CreateStartScripts::class) {
-        group = "build"
-        description = "Create run scripts for deck-check"
-        outputDir = file("$buildDir/scripts")
-        applicationName = "deck-check"
-
-        val jarTask = project.tasks.getByName("jar")
-        classpath = jarTask.outputs.files + configurations.getByName("runtime")
-        dependsOn(jarTask)
-
-        doLast {
-            val adc = conventionPluginByName(convention, "application") as ApplicationPluginConvention
-            adc.applicationDistribution.run {
-                println("doing $name")
-                into("bin") {
-                    from(project.tasks[name])
-                    fileMode = Integer.parseUnsignedInt("755", 8)
-                }
-
-            }
-        }
-    }
-
-//    named<Zip>("distZip") {
-//        val adc = conventionPluginByName(project.convention, "application") as ApplicationPluginConvention
-//        adc.applicationDistribution.from(project.tasks.getByName("deckCheckStartScripts")) {
-//            into("bin")
-//        }
-//    }
-
-}
-
-fun createScript(mainClass: String, name: String) {
-    tasks.create(name = name, type = CreateStartScripts::class) {
-        outputDir = file("$buildDir/scripts")
-        mainClassName = mainClass
-        applicationName = name
-        classpath = tasks[JavaPlugin.JAR_TASK_NAME].outputs.files + configurations.getByName("runtime")
-    }
-    // val jarTask = tasks.getByName("jar")
-    tasks[name].dependsOn(tasks.getByName("jar"))
-
-    val adc = conventionPluginByName(convention, "application") as ApplicationPluginConvention
-    adc.applicationDistribution.run {
-        println("doing $name")
-        into("bin") {
-            from(project.tasks[name])
-            fileMode = Integer.parseUnsignedInt("755", 8)
-        }
-
-    }
 }
 
 application {
-    mainClassName = "legends.DeckCheck"
-    application.applicationName = "deck-check"
-    applicationDefaultJvmArgs = listOf("-Ddeck-check.bot.token=$deckCheckBotToken")
+    if (project.hasProperty("bot-check")) {
+        mainClassName = "legends.BotCheck"
+        application.applicationName = "bot-check"
+        applicationDefaultJvmArgs = listOf("-Ddeck-check.bot.token=$deckCheckBotToken")
+    } else {
+        mainClassName = "legends.DeckCheck"
+        application.applicationName = "deck-check"
+        applicationDefaultJvmArgs = listOf("-Ddeck-check.bot.token=$deckCheckBotToken")
+    }
 }
-
-// apply(from = "$rootDir/../scripts.gradle.kts")
-//tasks.getByName("startScripts").enabled = false
-//tasks.getByName("run").enabled = false
-
-// createScript(mainClass = "legends.DeckCheck", name = "deck-check")
-// createScript(mainClass = "legends.BotCheck", name = "bot-check")

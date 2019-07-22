@@ -49,7 +49,7 @@ class DeckAnalysis(private val deck: Deck) {
         val withoutNeutral = allClassColours - GREY
         val deckClass = DeckClass
             .values()
-            .find { it.classColours == withoutNeutral } ?: DeckClass.UNKNOWN
+            .find { it.classColours == withoutNeutral } ?: DeckClass.NEUTRAL
 
         deckClassName = deckClass
             .name
@@ -181,7 +181,7 @@ class DeckAnalysis(private val deck: Deck) {
     }
 
     enum class DeckClass(val classColours: Set<ClassColour>) {
-        UNKNOWN(emptySet()),
+        NEUTRAL(emptySet()),
 
         SINGLE_GREEN(setOf(GREEN)),
         SINGLE_RED(setOf(RED)),

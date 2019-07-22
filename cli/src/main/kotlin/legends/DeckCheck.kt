@@ -8,7 +8,7 @@ class DeckCheck {
         @JvmStatic
         fun main(args: Array<String>) {
             // An example deck if one isn't provided
-            val code = "SPACgRnUAAAQdYkYdeeQlLmgpDhUkzkNrWaUcMfvoRrY"
+            val code = "SPAIqqeruxmVoolYnzpWAGmtiYkktAjqgIAKgSlDpDrckNbHbimTbhbg"
 
             val importCode = if (args.isEmpty()) code else args[0]
             val deck = Deck.importCode(importCode)
@@ -58,7 +58,7 @@ ${da.createManaString()}""".trimIndent())
                     val cost = first.cost
                     val power = if (first.power >= 0) "${first.power}" else "-"
                     val health = if (first.health >= 0) "${first.health}" else "-"
-                    println("  $name, count: ${typeCards.size}, [$cost/$power/$health], attr: [${typeCards.first().attributes.joinToString(", ")}]")
+                    println("  $name, count: ${typeCards.size}, ${first.rarity}, [$cost/$power/$health], attr: [${typeCards.first().attributes.joinToString(", ")}]")
                 }
 
         }
