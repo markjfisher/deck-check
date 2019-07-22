@@ -3,6 +3,7 @@ package legends
 import com.jessecorbett.diskord.api.rest.Embed
 import com.jessecorbett.diskord.api.rest.EmbedAuthor
 import com.jessecorbett.diskord.api.rest.EmbedImage
+import io.elderscrollslegends.Card
 import io.elderscrollslegends.Deck
 import mu.KotlinLogging
 
@@ -41,12 +42,7 @@ enum class DeckCommands(val cmd: String) {
 
     abstract fun run(args: List<String>, mention: String, username: String): ReplyData
 
-    fun show(
-        args: List<String>,
-        mention: String,
-        username: String,
-        type: String
-    ): List<String> {
+    fun show(args: List<String>, mention: String, username: String, type: String): List<String> {
         if (args.size != 1) {
             return listOf("$mention: Please supply a single deck code.")
         }
@@ -58,18 +54,10 @@ enum class DeckCommands(val cmd: String) {
 
         val reply = when (type) {
             "info", "detail" -> {
-                val line1 =
-                    String.format("%-10s: %-5d   %-10s: %-5d", "Common", da.commonCount, "Actions", da.actionsCount)
+                val line1 = String.format("%-10s: %-5d   %-10s: %-5d", "Common", da.commonCount, "Actions", da.actionsCount)
                 val line2 = String.format("%-10s: %-5d   %-10s: %-5d", "Rare", da.rareCount, "Items", da.itemsCount)
-                val line3 =
-                    String.format("%-10s: %-5d   %-10s: %-5d", "Epic", da.epicCount, "Support", da.supportsCount)
-                val line4 = String.format(
-                    "%-10s: %-5d   %-10s: %-5d",
-                    "Legendary",
-                    da.legendaryCount,
-                    "Creatures",
-                    da.creatureCount
-                )
+                val line3 = String.format("%-10s: %-5d   %-10s: %-5d", "Epic", da.epicCount, "Support", da.supportsCount)
+                val line4 = String.format("%-10s: %-5d   %-10s: %-5d", "Legendary", da.legendaryCount, "Creatures", da.creatureCount)
 
                 """|$mention : $deckCode
                 |```$line1
@@ -90,7 +78,43 @@ enum class DeckCommands(val cmd: String) {
 
             else -> "Unknown type: $type"
         }
-        return listOf(reply)
+
+        return if (type == "detail") {
+            val creatureData = collectCardData(deck, "Creature")
+            val actionData = collectCardData(deck, "Action")
+            val itemData = collectCardData(deck, "Item")
+            val supportData = collectCardData(deck, "Support")
+            val detailCreatures = if (creatureData.isNotBlank()) "$mention\nCreatures:```$creatureData```" else null
+            val detailActions = if (actionData.isNotBlank()) "$mention\nActions:```$actionData```" else null
+            val detailItems = if (itemData.isNotBlank()) "$mention\nItems:```$itemData```" else null
+            val detailSupports = if (supportData.isNotBlank()) "$mention\nSupports:```$supportData```" else null
+            listOf(reply, detailCreatures, detailActions, detailItems, detailSupports).mapNotNull { it }
+        } else {
+            listOf(reply)
+        }
+    }
+
+    private fun collectCardData(deck: Deck, type: String): String {
+        val of1Data = byType(deck.of(1), 1, type)
+        val of2Data = byType(deck.of(2), 2, type)
+        val of3Data = byType(deck.of(3), 3, type)
+        return listOf(of1Data, of2Data, of3Data).mapNotNull { if (it.isBlank()) null else it }.joinToString("\n")
+    }
+
+    private fun byType(cards: List<Card>, size: Int, type: String): String {
+        return cards
+            .asSequence()
+            .filter { it.type == type }
+            .sortedBy { it.cost }
+            .map { card ->
+                val cost = card.cost
+                val power = if (card.power >= 0) "${card.power}" else "-"
+                val health = if (card.health >= 0) "${card.health}" else "-"
+                "$size. ${card.rarity.take(4)} [$cost/$power/$health] ${card.name}"
+
+            }
+            .joinToString("\n")
+
     }
 
 }

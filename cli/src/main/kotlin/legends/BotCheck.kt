@@ -58,7 +58,6 @@ object BotCheck {
                                 CreateMessage(
                                     content = text,
                                     embed = replyData.embed
-                                    // fileContent = fileData
                                 )
                             )
                         }
