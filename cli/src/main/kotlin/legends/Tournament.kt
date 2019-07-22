@@ -1,5 +1,8 @@
 package legends
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Tournament(
     val id: String,
     val description: String = "",
