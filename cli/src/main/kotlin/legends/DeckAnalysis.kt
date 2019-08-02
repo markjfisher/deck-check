@@ -29,6 +29,7 @@ class DeckAnalysis(private val deck: Deck) {
     val totalUnique: Int
     val totalCards: Int
     val manaToCardCount: Map<Int, Int>
+    val subtypes: List<String>
 
     init {
         byRarity = deck.cards
@@ -103,6 +104,8 @@ class DeckAnalysis(private val deck: Deck) {
             acc[x] = sevenPlus + y
             acc
         })
+
+        subtypes = deck.cards.map { it.subtypes }.flatten().toHashSet().toList()
     }
 
     data class CardCount(

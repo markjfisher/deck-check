@@ -67,6 +67,7 @@ enum class DeckCommands(val cmd: String) {
                 |
                 |Class    : ${da.deckClassName} [${da.attributesText}]
                 |Keywords : ${da.keywordsText}
+                |Subtypes : ${da.subtypes.joinToString(", ")}
                 |
                 |Unique   : ${da.totalUnique}
                 |Total    : ${da.totalCards} (1s ${da.c1}, 2s ${da.c2}, 3s ${da.c3})
@@ -95,13 +96,23 @@ enum class DeckCommands(val cmd: String) {
     }
 
     private fun collectCardData(deck: Deck, type: String): String {
-        val of1Data = byType(deck.of(1), 1, type)
-        val of2Data = byType(deck.of(2), 2, type)
-        val of3Data = byType(deck.of(3), 3, type)
+        val maxCardNameLength = deck.cards.fold(0) { max, c ->
+            if (c.name.length > max) c.name.length else max
+        }
+
+        val of1Data = byType(deck.of(1), 1, type, maxCardNameLength)
+        val of2Data = byType(deck.of(2), 2, type, maxCardNameLength)
+        val of3Data = byType(deck.of(3), 3, type, maxCardNameLength)
         return listOf(of1Data, of2Data, of3Data).mapNotNull { if (it.isBlank()) null else it }.joinToString("\n")
     }
 
-    private fun byType(cards: List<Card>, size: Int, type: String): String {
+    private fun byType(
+        cards: List<Card>,
+        size: Int,
+        type: String,
+        maxCardNameLength: Int
+    ): String {
+
         return cards
             .asSequence()
             .filter { it.type == type }
@@ -110,7 +121,12 @@ enum class DeckCommands(val cmd: String) {
                 val cost = card.cost
                 val power = if (card.power >= 0) "${card.power}" else "-"
                 val health = if (card.health >= 0) "${card.health}" else "-"
-                "$size. ${card.rarity.take(4)} [$cost/$power/$health] ${card.name}"
+                val longest = maxCardNameLength.toString()
+                val namesString = String.format("%-${longest}s", card.name.take(maxCardNameLength))
+                val typesString = if (card.subtypes.isNotEmpty()) "| ${card.subtypes.joinToString(",")}" else ""
+                val cphString = "[$cost/$power/$health]"
+                val rarityString = String.format("%-6s", card.rarity.take(6))
+                "$size x $namesString $cphString $rarityString $typesString"
 
             }
             .joinToString("\n")

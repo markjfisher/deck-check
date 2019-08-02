@@ -6,16 +6,36 @@ import kotlinx.serialization.Serializable
 data class Tournament(
     val id: String,
     val description: String = "",
-    val rules: MutableList<String> = mutableListOf()
+    val rules: MutableList<String> = mutableListOf(),
+    val players: MutableList<Player> = mutableListOf()
 ) {
     override fun toString(): String {
-        val head = """
+        return """
             |Id: $id
             |Description: $description
+            |Players:
+            |${players.joinToString("\n") { " - $it" }}
             |Rules:
-            |
+            |${rules.joinToString("\n") { " - $it" }}
         """.trimMargin()
-        val rules = rules.joinToString("\n") { " - $it" }
-        return head + rules
+    }
+
+    fun hasPlayer(ign: String)= players.any { it.name == ign }
+
+    fun addPlayer(ign: String, deck: String) {
+        removePlayer(ign)
+        players.add(Player(name = ign, deck = deck))
+    }
+
+    fun removePlayer(ign: String) = players.removeAll { it.name == ign }
+}
+
+@Serializable
+data class Player(
+    val name: String,
+    val deck: String
+) {
+    override fun toString(): String {
+        return "$name, deck: $deck"
     }
 }
