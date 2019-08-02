@@ -31,4 +31,15 @@ internal class WrappedListTest {
         assertThat(wrappedList.containsOnly("x")).isFalse()
         assertThat(wrappedList.containsOnly("a", "x")).isFalse()
     }
+
+    @Test
+    fun `subset checks the list is elements are in the given list`() {
+        val wrappedList = WrappedList(listOf("a", "b"))
+
+        assertThat(wrappedList.subsetOf("a", "b")).isTrue()
+        assertThat(wrappedList.subsetOf("a", "b", "c")).isTrue()
+        assertThat(wrappedList.subsetOf("c")).isFalse()
+        assertThat(wrappedList.subsetOf("a", "c")).isFalse()
+        assertThat(wrappedList.subsetOf("c", "b", "a")).isTrue()
+    }
 }

@@ -96,12 +96,17 @@ enum class TournamentCommands(val cmd: String) {
             | deck.cardCount("Marked Man") == 3
             |
             |Sub types of creature (Vampire, Orc, etc) can be checked with:
-            |SUBSET TEST:
-            | subtypes.contains('Vampire')          // if all subtypes contains Vampire, Orc and Nord, this is OK
-            | subtypes.contains('Vampire', 'Nord')  // same as above
+            |CONTAINS TEST:
+            | subtypes.contains('Vampire')          // must have at least one Vampire
+            | subtypes.contains('Vampire', 'Nord')  // must have at least one Vampire and Nord
+            | subtypes.contains('Fish')             // if you don't have a Fish, this will fail
             |
             |FULL SET TEST:
-            | subtypes.containsAll('Orc', 'Nord')   // If any other subtypes exist (e.g. Imp) this will fail
+            | subtypes.containsAll('Orc', 'Nord')   // You must have only Orc and Nords
+            |
+            |SUBSET TEST:
+            | // check your creatures all are any of the given list
+            | subtypes.subsetOf('Skeleton', 'Spirit', 'Vampire', 'Mummy')
             |
             |The following variables are available to check:
             | commonCount, rareCount, epicCount, legendaryCount
