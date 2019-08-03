@@ -49,7 +49,7 @@ enum class DeckCommands(val cmd: String) {
 
         val deckCode = args[0]
         logger.info { "User: $username asked for $type for code: $deckCode" }
-        val deck = Deck.importCode(deckCode)
+        val deck = DeckFixes.fix(Deck.importCode(deckCode))
         val da = DeckAnalysis(deck)
 
         val reply = when (type) {

@@ -15,10 +15,14 @@ class DeckAnalysis(private val deck: Deck) {
     val epicCount: Int
     val rareCount: Int
     val commonCount: Int
-    val creatures: Map<String, CardCount>
-    val actions: Map<String, CardCount>
-    val items: Map<String, CardCount>
-    val supports: Map<String, CardCount>
+    val creaturesMap: Map<String, CardCount>
+    val actionsMap: Map<String, CardCount>
+    val itemsMap: Map<String, CardCount>
+    val supportsMap: Map<String, CardCount>
+    val creatures: List<Card>
+    val actions: List<Card>
+    val items: List<Card>
+    val supports: List<Card>
     val creatureCount: Int
     val actionsCount: Int
     val itemsCount: Int
@@ -67,15 +71,20 @@ class DeckAnalysis(private val deck: Deck) {
         rareCount = byRarity["Rare"]?.size ?: 0
         commonCount = byRarity["Common"]?.size ?: 0
 
-        creatures = byType("Creature")
-        actions = byType("Action")
-        items = byType("Item")
-        supports = byType("Support")
+        creaturesMap = byType("Creature")
+        actionsMap = byType("Action")
+        itemsMap = byType("Item")
+        supportsMap = byType("Support")
 
-        creatureCount = creatures.map {it.value.count}.sum()
-        actionsCount = actions.map {it.value.count}.sum()
-        itemsCount = items.map {it.value.count}.sum()
-        supportsCount = supports.map {it.value.count}.sum()
+        creatures = creaturesMap.values.map { it.card }
+        actions = actionsMap.values.map { it.card }
+        items = itemsMap.values.map { it.card }
+        supports = supportsMap.values.map { it.card }
+
+        creatureCount = creaturesMap.map {it.value.count}.sum()
+        actionsCount = actionsMap.map {it.value.count}.sum()
+        itemsCount = itemsMap.map {it.value.count}.sum()
+        supportsCount = supportsMap.map {it.value.count}.sum()
 
         c1 = deck.of(1).size
         c2 = deck.of(2).size
@@ -107,6 +116,14 @@ class DeckAnalysis(private val deck: Deck) {
 
         subtypes = deck.cards.map { it.subtypes }.flatten().toHashSet().toList()
     }
+
+    fun creaturesByRarity(rarity: String): List<String> = creatures.filter { it.rarity == rarity }.map { it.name }
+    fun actionsByRarity(rarity: String): List<String> = actions.filter { it.rarity == rarity }.map { it.name }
+    fun itemsByRarity(rarity: String): List<String> = items.filter { it.rarity == rarity }.map { it.name }
+    fun supportsByRarity(rarity: String): List<String> = supports.filter { it.rarity == rarity }.map { it.name }
+    fun raritiesOfType(type: String): List<String> = byType(type).values.map { it.card.rarity }.toHashSet().toList().sorted()
+
+    fun creaturesOfSubtype(type: String): List<String> = creatures.filter { it.subtypes == listOf(type) }.map { it.name }
 
     data class CardCount(
         val count: Int,

@@ -87,4 +87,55 @@ class MVELEngineTest {
         assertThat(failures).containsOnly("subtypes.containsOnly('Fish', 'Nord', 'Vampire', 'Orc')")
 
     }
+
+    @Test
+    fun `by rarity tests`() {
+        val legendaryCreature = Card(name = "creature 1", subtypes = listOf("Nord"), type = "Creature", rarity = "Legendary")
+        val commonAction1 = Card(name = "common action 1", type = "Action", rarity = "Common")
+        val commonAction2 = Card(name = "common action 2", type = "Action", rarity = "Common")
+        val rareAction1 = Card(name = "rare action 1", type = "Action", rarity = "Rare")
+        val commonItem1 = Card(name = "common item 1", type = "Item", rarity = "Common")
+        val commonItem2 = Card(name = "common item 2", type = "Item", rarity = "Common")
+        val epicItem1 = Card(name = "epic item 1", type = "Item", rarity = "Epic")
+        val rareSupport1 = Card(name = "rare support 1", type = "Support", rarity = "Rare")
+
+        val deck = Deck(cards = listOf(legendaryCreature, commonAction1, commonAction1, commonAction2, rareAction1, commonItem1, commonItem2, commonItem2, epicItem1, rareSupport1, rareSupport1))
+
+        var failures: List<String>
+        val tournament = Tournament(id = "t1")
+
+        tournament.rules.add("analysis.creaturesByRarity('Common').size() == 0")
+        tournament.rules.add("analysis.creaturesByRarity('Rare').size() == 0")
+        tournament.rules.add("analysis.creaturesByRarity('Epic').size() == 0")
+        tournament.rules.add("analysis.creaturesByRarity('Legendary').size() == 1")
+        tournament.rules.add("analysis.creaturesByRarity('Legendary').containsAll(['creature 1'])")
+        tournament.rules.add("analysis.raritiesOfType('Creature').containsAll(['Legendary'])")
+
+        tournament.rules.add("analysis.actionsByRarity('Common').size() == 2")
+        tournament.rules.add("analysis.actionsByRarity('Common').containsAll(['common action 2', 'common action 1'])")
+        tournament.rules.add("analysis.actionsByRarity('Rare').size() == 1")
+        tournament.rules.add("analysis.actionsByRarity('Rare').containsAll(['rare action 1'])")
+        tournament.rules.add("analysis.actionsByRarity('Epic').size() == 0")
+        tournament.rules.add("analysis.actionsByRarity('Legendary').size() == 0")
+        tournament.rules.add("analysis.raritiesOfType('Action').containsAll(['Common', 'Rare'])")
+        tournament.rules.add("['Common', 'Rare', 'Legendary'].containsAll(analysis.raritiesOfType('Action'))")
+
+        tournament.rules.add("analysis.itemsByRarity('Common').size() == 2")
+        tournament.rules.add("analysis.itemsByRarity('Common')containsAll(['common item 1', 'common item 2'])")
+        tournament.rules.add("analysis.itemsByRarity('Rare').size() == 0")
+        tournament.rules.add("analysis.itemsByRarity('Epic').size() == 1")
+        tournament.rules.add("analysis.itemsByRarity('Epic')containsAll(['epic item 1'])")
+        tournament.rules.add("analysis.itemsByRarity('Legendary').size() == 0")
+        tournament.rules.add("analysis.raritiesOfType('Item').containsAll(['Common', 'Epic'])")
+
+        tournament.rules.add("analysis.supportsByRarity('Common').size() == 0")
+        tournament.rules.add("analysis.supportsByRarity('Rare').size() == 1")
+        tournament.rules.add("analysis.supportsByRarity('Rare')containsAll(['rare support 1'])")
+        tournament.rules.add("analysis.supportsByRarity('Epic').size() == 0")
+        tournament.rules.add("analysis.supportsByRarity('Legendary').size() == 0")
+        tournament.rules.add("analysis.raritiesOfType('Support').containsAll(['Rare'])")
+        failures = MVELEngine.checkRules(tournament, deck)
+        assertThat(failures).isEmpty()
+
+    }
 }

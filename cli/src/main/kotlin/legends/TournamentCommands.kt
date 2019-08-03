@@ -83,7 +83,11 @@ enum class TournamentCommands(val cmd: String) {
             |
             |Only registered admins can change tournaments
             |
-            |Rules are boolean statements, e.g.
+            |# DEFINING RULES
+            |The rules engine uses MVEL, go look it up for full details.
+            |
+            |Rules added to tournaments are boolean statements that must all return true for a
+            |deck to be valid, e.g.
             | rareCount == 1
             | totalCards == 75
             | rareCount == 1; totalCards == 75
@@ -105,8 +109,23 @@ enum class TournamentCommands(val cmd: String) {
             | subtypes.containsAll('Orc', 'Nord')   // You must have only Orc and Nords
             |
             |SUBSET TEST:
-            | // check your creatures all are any of the given list
+            | # check your creatures all are any of the given list
             | subtypes.subsetOf('Skeleton', 'Spirit', 'Vampire', 'Mummy')
+            |
+            |MISC
+            | # types by rarity gives a list of names of the cards.
+            | analysis.creaturesByRarity(rarity): List<String>
+            | analysis.actionsByRarity(rarity): List<String>
+            | analysis.itemsByRarity(rarity): List<String>
+            | analysis.supportsByRarity(rarity): List<String>
+            | (rarities are: Common, Rare, Epic, Legendary)
+            |
+            | e.g
+            | analysis.creaturesByRarity('Common').size() == 1
+            | analysis.creaturesByRarity('Rare').containsAll(['Dwarven Dynamo'])
+            |
+            | # creaturesOfSubtype
+            | analysis.creaturesOfSubtype('Factotum').containsAll(['Reflective Automaton'])
             |
             |The following variables are available to check:
             | commonCount, rareCount, epicCount, legendaryCount
@@ -114,7 +133,6 @@ enum class TournamentCommands(val cmd: String) {
             | of1Count, of2Count, of3Count, totalCards, uniqueCards
             | deckClassName
             |
-            |Note: No quote marks are required anywhere.
             |```""".trimMargin()
     }
 
@@ -268,11 +286,11 @@ enum class TournamentCommands(val cmd: String) {
             return "Invalid check tournament command, please supply an ID and deck code"
         }
         val tid = args[0]
-        val tournament = BotCheck.tournaments.find { it.id == tid }
+        val tournament = BotCheck.tournaments.find { it.id.toLowerCase() == tid.toLowerCase() }
             ?: return "Error: Cannot check deck code. Tournament with id $tid does not exist"
 
         val deckCode = args[1]
-        val deck = Deck.importCode(deckCode)
+        val deck = DeckFixes.fix(Deck.importCode(deckCode))
 
         val failedRules = checkRules(tournament, deck)
         return if (failedRules.isNotEmpty()) """
