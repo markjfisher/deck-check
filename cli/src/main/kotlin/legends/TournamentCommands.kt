@@ -9,7 +9,7 @@ import legends.MVELEngine.checkRules
 enum class TournamentCommands(val cmd: String) {
     CMD_HELP("help") {
         override fun run(args: List<String>, mention: String, username: String): ReplyData {
-            return ReplyData(text = listOf(helpTournaments()))
+            return ReplyData(text = helpTournaments())
         }
     },
     CMD_LIST("list") {
@@ -66,8 +66,8 @@ enum class TournamentCommands(val cmd: String) {
 
     abstract fun run(args: List<String>, mention: String, username: String): ReplyData
 
-    fun helpTournaments(): String {
-        return """
+    fun helpTournaments(): List<String> {
+        return listOf("""
             |```!tournament [help|list|create|delete|addRule|delRule|register|remove|check|save|load] <args>
             | help - information about commands
             | list - list known tournaments
@@ -82,8 +82,10 @@ enum class TournamentCommands(val cmd: String) {
             | load "data" - loads serialized data
             |
             |Only registered admins can change tournaments
-            |
-            |# DEFINING RULES
+            |```""".trimMargin(),
+
+            """
+            |```# DEFINING RULES
             |The rules engine uses MVEL, go look it up for full details.
             |
             |Rules added to tournaments are boolean statements that must all return true for a
@@ -111,8 +113,10 @@ enum class TournamentCommands(val cmd: String) {
             |SUBSET TEST:
             | # check your creatures all are any of the given list
             | subtypes.subsetOf('Skeleton', 'Spirit', 'Vampire', 'Mummy')
-            |
-            |MISC
+            |```""".trimMargin(),
+
+            """
+            |```MISC
             | # types by rarity gives a list of names of the cards.
             | analysis.creaturesByRarity(rarity): List<String>
             | analysis.actionsByRarity(rarity): List<String>
@@ -133,7 +137,7 @@ enum class TournamentCommands(val cmd: String) {
             | of1Count, of2Count, of3Count, totalCards, uniqueCards
             | deckClassName
             |
-            |```""".trimMargin()
+            |```""".trimMargin())
     }
 
     fun createTournament(args: List<String>, username: String): String {

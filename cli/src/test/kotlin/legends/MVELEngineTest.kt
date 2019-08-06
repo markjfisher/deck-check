@@ -138,4 +138,28 @@ class MVELEngineTest {
         assertThat(failures).isEmpty()
 
     }
+
+    @Test
+    fun `is undead checks`() {
+        val creature1 = Card(name = "Tenarr Zalviit Lurker", subtypes = listOf("Khajiit"), type = "Creature")
+        val creature2 = Card(name = "Death Hound", subtypes = listOf("Beast"), type = "Creature")
+        val creature3 = Card(name = "Reflective Automaton", subtypes = listOf("Factotum"), type = "Creature")
+        val creature4 = Card(name = "Skeletal Dragon", subtypes = listOf("Dragon"), type = "Creature")
+        val creature5 = Card(name = "A vampire", subtypes = listOf("Vampire"), type = "Creature")
+        val deck1 = Deck(cards = listOf(creature1, creature2, creature3, creature4, creature5))
+
+        var failures: List<String>
+        val tournament = Tournament(id = "t1")
+
+        tournament.rules.add("analysis.isUndead()")
+        failures = MVELEngine.checkRules(tournament, deck1)
+        assertThat(failures).isEmpty()
+
+        val creature6 = Card(name = "A Khajiit", subtypes = listOf("Khajiit"), type = "Creature")
+        val deck2 = Deck(cards = listOf(creature1, creature2, creature3, creature4, creature5, creature6))
+
+        failures = MVELEngine.checkRules(tournament, deck2)
+        assertThat(failures).containsOnly("analysis.isUndead()")
+
+    }
 }

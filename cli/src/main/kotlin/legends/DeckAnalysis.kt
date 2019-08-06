@@ -34,6 +34,9 @@ class DeckAnalysis(private val deck: Deck) {
     val totalCards: Int
     val manaToCardCount: Map<Int, Int>
     val subtypes: List<String>
+    val costToCards: Map<Int, List<Card>>
+    val costs: List<Int>
+    val countByCost: Map<Int, Int>
 
     init {
         byRarity = deck.cards
@@ -115,15 +118,54 @@ class DeckAnalysis(private val deck: Deck) {
         })
 
         subtypes = deck.cards.map { it.subtypes }.flatten().toHashSet().toList()
+
+        costs = deck.cards.map { it.cost }.toHashSet().toList().sorted()
+
+        costToCards = (0..30).fold(mutableMapOf<Int, List<Card>>(), { acc, cost ->
+            acc[cost] = deck.cards.filter { it.cost == cost }.toHashSet().toList().sortedBy { it.name }
+            acc
+        }).toMap()
+
+        countByCost = (0..30).fold(mutableMapOf<Int, Int>(), { acc, cost ->
+            acc[cost] = deck.cards.filter { it.cost == cost }.size
+            acc
+        }).toMap()
+
     }
 
     fun creaturesByRarity(rarity: String): List<String> = creatures.filter { it.rarity == rarity }.map { it.name }
     fun actionsByRarity(rarity: String): List<String> = actions.filter { it.rarity == rarity }.map { it.name }
     fun itemsByRarity(rarity: String): List<String> = items.filter { it.rarity == rarity }.map { it.name }
     fun supportsByRarity(rarity: String): List<String> = supports.filter { it.rarity == rarity }.map { it.name }
+
     fun raritiesOfType(type: String): List<String> = byType(type).values.map { it.card.rarity }.toHashSet().toList().sorted()
 
     fun creaturesOfSubtype(type: String): List<String> = creatures.filter { it.subtypes == listOf(type) }.map { it.name }
+
+    fun isUndead(): Boolean {
+        val isStandardUndead = creatures.all{ card ->
+            listOf("Skeleton", "Spirit", "Vampire", "Mummy").contains(card.subtypes.first())
+        }
+
+        val allowedKhajiit = hashSetOf("Tenarr Zalviit Lurker", "Tenarr Zalviit Nightstalker", "Dro-m'Athra Reaper")
+        val allowedBeast = hashSetOf("Death Hound")
+        val allowedDragon = hashSetOf("Skeletal Dragon")
+        val allowedFactotum = hashSetOf("Reflective Automaton")
+
+        val allowedOtherUndead = allowedKhajiit + allowedBeast + allowedDragon + allowedFactotum
+
+        val khajiitCards = creaturesOfSubtype("Khajiit").toHashSet()
+        val beastCards = creaturesOfSubtype("Khajiit").toHashSet()
+        val dragonCards = creaturesOfSubtype("Khajiit").toHashSet()
+        val factotumCards = creaturesOfSubtype("Khajiit").toHashSet()
+
+        val nonStandardUndeadCards = khajiitCards + beastCards + dragonCards + factotumCards
+
+        val nonStandardCardsAreUndead = nonStandardUndeadCards.minus(allowedOtherUndead).isEmpty()
+
+        return isStandardUndead || (!isStandardUndead && nonStandardCardsAreUndead)
+
+    }
 
     data class CardCount(
         val count: Int,

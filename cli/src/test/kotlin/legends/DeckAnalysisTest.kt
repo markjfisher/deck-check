@@ -96,6 +96,55 @@ internal class DeckAnalysisTest {
     }
 
     @Test
+    fun `is undead check`() {
+        val creature1 = Card(name = "Tenarr Zalviit Lurker", subtypes = listOf("Khajiit"), type = "Creature")
+        val creature2 = Card(name = "Death Hound", subtypes = listOf("Beast"), type = "Creature")
+        val creature3 = Card(name = "Reflective Automaton", subtypes = listOf("Factotum"), type = "Creature")
+        val creature4 = Card(name = "Skeletal Dragon", subtypes = listOf("Dragon"), type = "Creature")
+        val deck1 = Deck(cards = listOf(creature1, creature1, creature2, creature3, creature3, creature4))
+        assertThat(DeckAnalysis(deck1).isUndead()).isTrue()
+
+        val creature5 = Card(name = "Some vampire", subtypes = listOf("Vampire"), type = "Creature")
+        val deck2 = Deck(cards = listOf(creature1, creature1, creature2, creature3, creature3, creature4, creature5))
+        assertThat(DeckAnalysis(deck2).isUndead()).isTrue()
+
+        val creature6 = Card(name = "Some other khajiit", subtypes = listOf("Khajiit"), type = "Creature")
+        val deck3 = Deck(cards = listOf(creature1, creature1, creature2, creature3, creature3, creature4, creature5, creature6))
+        assertThat(DeckAnalysis(deck3).isUndead()).isFalse()
+
+    }
+
+    @Test
+    fun `cost to cards`() {
+        val creature1 = Card(name = "creature 1", subtypes = listOf("Nord"), type = "Creature", cost = 0)
+        val creature2 = Card(name = "creature 2", subtypes = listOf("Nord"), type = "Creature", cost = 0)
+        val creature3 = Card(name = "creature 3", subtypes = listOf("Factotum"), type = "Creature", cost = 2)
+        val creature4 = Card(name = "creature 4", subtypes = listOf("Vampire"), type = "Creature", cost = 4)
+        val deck = Deck(cards = listOf(creature1, creature1, creature2, creature3, creature3, creature4))
+        val da = DeckAnalysis(deck)
+
+        assertThat(da.costToCards[0]).containsExactlyInAnyOrder(creature1, creature2)
+        assertThat(da.costToCards[1]).isEmpty()
+        assertThat(da.costToCards[2]).containsExactlyInAnyOrder(creature3)
+        assertThat(da.costToCards[3]).isEmpty()
+        assertThat(da.costToCards[4]).containsExactlyInAnyOrder(creature4)
+        (5..30).forEach { i ->
+            assertThat(da.costToCards[i]).isEmpty()
+        }
+
+        assertThat(da.costs).containsExactly(0, 2, 4)
+
+        assertThat(da.countByCost[0]).isEqualTo(3)
+        assertThat(da.countByCost[1]).isEqualTo(0)
+        assertThat(da.countByCost[2]).isEqualTo(2)
+        assertThat(da.countByCost[3]).isEqualTo(0)
+        assertThat(da.countByCost[4]).isEqualTo(1)
+        (5..30).forEach { i ->
+            assertThat(da.countByCost[i]).isEqualTo(0)
+        }
+    }
+
+    @Test
     @Disabled("Runs against live API")
     fun `missing cards test`() {
         CardCache.load()
