@@ -7,6 +7,7 @@ import org.jeasy.rules.api.Facts
 import org.jeasy.rules.api.Rules
 import org.jeasy.rules.core.DefaultRulesEngine
 import org.jeasy.rules.mvel.MVELRule
+import org.mvel2.templates.TemplateRuntime
 
 object MVELEngine {
     fun checkRules(tournament: Tournament, deck: Deck): List<String> {
@@ -36,7 +37,7 @@ object MVELEngine {
         facts.put("uniqueCards", analysis.totalUnique)
         facts.put("deckClassName", analysis.deckClassName)
         facts.put("subtypes", WrappedList(analysis.subtypes))
-        facts.put("analysis", analysis)
+        facts.put("a", analysis)
 
         facts.put("valid", valid)
         facts.put("deck", WrappedDeck(deck))
@@ -49,7 +50,13 @@ object MVELEngine {
         val allCorrectSet = (0 until tournament.rules.size).toSet()
         val failedRulesSet = allCorrectSet - valid.passes
         return failedRulesSet.map {
-            tournament.rules[it]
+            if (tournament.reasons.size > it) {
+                // use a reason if one supplied
+                TemplateRuntime.eval(tournament.reasons[it], facts.asMap()) as String
+            } else {
+                // otherwise return the failing rule definition
+                tournament.rules[it]
+            }
         }
     }
 

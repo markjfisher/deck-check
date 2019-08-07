@@ -116,22 +116,33 @@ enum class TournamentCommands(val cmd: String) {
             |```""".trimMargin(),
 
             """
-            |```MISC
+            |```Analysis Object
+            | # An 'analysis' object is exposed via 'a'
+            |
             | # types by rarity gives a list of names of the cards.
-            | analysis.creaturesByRarity(rarity): List<String>
-            | analysis.actionsByRarity(rarity): List<String>
-            | analysis.itemsByRarity(rarity): List<String>
-            | analysis.supportsByRarity(rarity): List<String>
+            | a.creaturesByRarity(rarity): List<String>
+            | a.actionsByRarity(rarity): List<String>
+            | a.itemsByRarity(rarity): List<String>
+            | a.supportsByRarity(rarity): List<String>
             | (rarities are: Common, Rare, Epic, Legendary)
             |
             | e.g
-            | analysis.creaturesByRarity('Common').size() == 1
-            | analysis.creaturesByRarity('Rare').containsAll(['Dwarven Dynamo'])
+            | a.creaturesByRarity('Common').size() == 1
+            | a.creaturesByRarity('Rare').containsAll(['Dwarven Dynamo'])
             |
             | # creaturesOfSubtype
-            | analysis.creaturesOfSubtype('Factotum').containsAll(['Reflective Automaton'])
+            | a.creaturesOfSubtype('Factotum').containsAll(['Reflective Automaton'])
             |
-            |The following variables are available to check:
+            | # cost functions
+            | a.costToCards[n]: List<Card> // gives list of unique cards that cost n
+            |
+            | a.countByCost[n]: Int // get just the count of cards that cost n.
+            |
+            | a.costs: List<Int> // All the costs that exist in the deck, e.g. if made up of only 0,1,2 cost
+            |```""".trimMargin(),
+
+            """
+            |```The following variables are available to check:
             | commonCount, rareCount, epicCount, legendaryCount
             | actionsCount, itemsCount, supportsCount
             | of1Count, of2Count, of3Count, totalCards, uniqueCards

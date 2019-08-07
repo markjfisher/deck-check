@@ -7,6 +7,7 @@ data class Tournament(
     val id: String,
     val description: String = "",
     val rules: MutableList<String> = mutableListOf(),
+    val reasons: MutableList<String> = mutableListOf(),
     val players: MutableList<Player> = mutableListOf()
 ) {
     override fun toString(): String {

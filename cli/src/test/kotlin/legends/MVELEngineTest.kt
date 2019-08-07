@@ -30,6 +30,7 @@ class MVELEngineTest {
 
         // ... and subsets
         tournament.rules.clear()
+        tournament.reasons.clear()
         tournament.rules.add("subtypes.contains('Vampire', 'Nord')")
         failures = MVELEngine.checkRules(tournament, deck1)
         assertThat(failures).isEmpty()
@@ -49,14 +50,18 @@ class MVELEngineTest {
         // ... but not when not in set
         tournament.rules.clear()
         tournament.rules.add("subtypes.contains('Fish')")
+        tournament.reasons.clear()
+        tournament.reasons.add("You must have a Fish type. You have: @foreach{type: subtypes}@{type}@end{', '}")
         failures = MVELEngine.checkRules(tournament, deck1)
-        assertThat(failures).containsOnly("subtypes.contains('Fish')")
+        assertThat(failures).containsOnly("You must have a Fish type. You have: Nord, Orc, Vampire")
 
         // ... or with ones that are included
         tournament.rules.clear()
+        tournament.reasons.clear()
         tournament.rules.add("subtypes.contains('Vampire', 'Fish')")
+        tournament.reasons.add("You must have a Fish and a Vampire. You have: @foreach{type: subtypes}@{type}@end{', '}")
         failures = MVELEngine.checkRules(tournament, deck1)
-        assertThat(failures).containsOnly("subtypes.contains('Vampire', 'Fish')")
+        assertThat(failures).containsOnly("You must have a Fish and a Vampire. You have: Nord, Orc, Vampire")
 
         //////////////////////////////////////////
         // containsOnly(item...)
@@ -76,15 +81,19 @@ class MVELEngineTest {
 
         // But all elements must be present
         tournament.rules.clear()
+        tournament.reasons.clear()
         tournament.rules.add("subtypes.containsOnly('Vampire', 'Nord')")
+        tournament.reasons.add("You must have only Nord and Vampire types. You have: @foreach{type: subtypes}@{type}@end{', '}")
         failures = MVELEngine.checkRules(tournament, deck1)
-        assertThat(failures).containsOnly("subtypes.containsOnly('Vampire', 'Nord')")
+        assertThat(failures).containsOnly("You must have only Nord and Vampire types. You have: Nord, Orc, Vampire")
 
         // elements not in the list fail
         tournament.rules.clear()
+        tournament.reasons.clear()
         tournament.rules.add("subtypes.containsOnly('Fish', 'Nord', 'Vampire', 'Orc')")
+        tournament.reasons.add("You must have only Fish, Nord Vampire, and Orc types. You have: @foreach{type: subtypes}@{type}@end{', '}")
         failures = MVELEngine.checkRules(tournament, deck1)
-        assertThat(failures).containsOnly("subtypes.containsOnly('Fish', 'Nord', 'Vampire', 'Orc')")
+        assertThat(failures).containsOnly("You must have only Fish, Nord Vampire, and Orc types. You have: Nord, Orc, Vampire")
 
     }
 
@@ -104,36 +113,36 @@ class MVELEngineTest {
         var failures: List<String>
         val tournament = Tournament(id = "t1")
 
-        tournament.rules.add("analysis.creaturesByRarity('Common').size() == 0")
-        tournament.rules.add("analysis.creaturesByRarity('Rare').size() == 0")
-        tournament.rules.add("analysis.creaturesByRarity('Epic').size() == 0")
-        tournament.rules.add("analysis.creaturesByRarity('Legendary').size() == 1")
-        tournament.rules.add("analysis.creaturesByRarity('Legendary').containsAll(['creature 1'])")
-        tournament.rules.add("analysis.raritiesOfType('Creature').containsAll(['Legendary'])")
+        tournament.rules.add("a.creaturesByRarity('Common').size() == 0")
+        tournament.rules.add("a.creaturesByRarity('Rare').size() == 0")
+        tournament.rules.add("a.creaturesByRarity('Epic').size() == 0")
+        tournament.rules.add("a.creaturesByRarity('Legendary').size() == 1")
+        tournament.rules.add("a.creaturesByRarity('Legendary').containsAll(['creature 1'])")
+        tournament.rules.add("a.raritiesOfType('Creature').containsAll(['Legendary'])")
 
-        tournament.rules.add("analysis.actionsByRarity('Common').size() == 2")
-        tournament.rules.add("analysis.actionsByRarity('Common').containsAll(['common action 2', 'common action 1'])")
-        tournament.rules.add("analysis.actionsByRarity('Rare').size() == 1")
-        tournament.rules.add("analysis.actionsByRarity('Rare').containsAll(['rare action 1'])")
-        tournament.rules.add("analysis.actionsByRarity('Epic').size() == 0")
-        tournament.rules.add("analysis.actionsByRarity('Legendary').size() == 0")
-        tournament.rules.add("analysis.raritiesOfType('Action').containsAll(['Common', 'Rare'])")
-        tournament.rules.add("['Common', 'Rare', 'Legendary'].containsAll(analysis.raritiesOfType('Action'))")
+        tournament.rules.add("a.actionsByRarity('Common').size() == 2")
+        tournament.rules.add("a.actionsByRarity('Common').containsAll(['common action 2', 'common action 1'])")
+        tournament.rules.add("a.actionsByRarity('Rare').size() == 1")
+        tournament.rules.add("a.actionsByRarity('Rare').containsAll(['rare action 1'])")
+        tournament.rules.add("a.actionsByRarity('Epic').size() == 0")
+        tournament.rules.add("a.actionsByRarity('Legendary').size() == 0")
+        tournament.rules.add("a.raritiesOfType('Action').containsAll(['Common', 'Rare'])")
+        tournament.rules.add("['Common', 'Rare', 'Legendary'].containsAll(a.raritiesOfType('Action'))")
 
-        tournament.rules.add("analysis.itemsByRarity('Common').size() == 2")
-        tournament.rules.add("analysis.itemsByRarity('Common')containsAll(['common item 1', 'common item 2'])")
-        tournament.rules.add("analysis.itemsByRarity('Rare').size() == 0")
-        tournament.rules.add("analysis.itemsByRarity('Epic').size() == 1")
-        tournament.rules.add("analysis.itemsByRarity('Epic')containsAll(['epic item 1'])")
-        tournament.rules.add("analysis.itemsByRarity('Legendary').size() == 0")
-        tournament.rules.add("analysis.raritiesOfType('Item').containsAll(['Common', 'Epic'])")
+        tournament.rules.add("a.itemsByRarity('Common').size() == 2")
+        tournament.rules.add("a.itemsByRarity('Common')containsAll(['common item 1', 'common item 2'])")
+        tournament.rules.add("a.itemsByRarity('Rare').size() == 0")
+        tournament.rules.add("a.itemsByRarity('Epic').size() == 1")
+        tournament.rules.add("a.itemsByRarity('Epic')containsAll(['epic item 1'])")
+        tournament.rules.add("a.itemsByRarity('Legendary').size() == 0")
+        tournament.rules.add("a.raritiesOfType('Item').containsAll(['Common', 'Epic'])")
 
-        tournament.rules.add("analysis.supportsByRarity('Common').size() == 0")
-        tournament.rules.add("analysis.supportsByRarity('Rare').size() == 1")
-        tournament.rules.add("analysis.supportsByRarity('Rare')containsAll(['rare support 1'])")
-        tournament.rules.add("analysis.supportsByRarity('Epic').size() == 0")
-        tournament.rules.add("analysis.supportsByRarity('Legendary').size() == 0")
-        tournament.rules.add("analysis.raritiesOfType('Support').containsAll(['Rare'])")
+        tournament.rules.add("a.supportsByRarity('Common').size() == 0")
+        tournament.rules.add("a.supportsByRarity('Rare').size() == 1")
+        tournament.rules.add("a.supportsByRarity('Rare')containsAll(['rare support 1'])")
+        tournament.rules.add("a.supportsByRarity('Epic').size() == 0")
+        tournament.rules.add("a.supportsByRarity('Legendary').size() == 0")
+        tournament.rules.add("a.raritiesOfType('Support').containsAll(['Rare'])")
         failures = MVELEngine.checkRules(tournament, deck)
         assertThat(failures).isEmpty()
 
@@ -151,7 +160,8 @@ class MVELEngineTest {
         var failures: List<String>
         val tournament = Tournament(id = "t1")
 
-        tournament.rules.add("analysis.isUndead()")
+        tournament.rules.add("a.isUndead()")
+        tournament.reasons.add("You must have only undead creatures.")
         failures = MVELEngine.checkRules(tournament, deck1)
         assertThat(failures).isEmpty()
 
@@ -159,7 +169,37 @@ class MVELEngineTest {
         val deck2 = Deck(cards = listOf(creature1, creature2, creature3, creature4, creature5, creature6))
 
         failures = MVELEngine.checkRules(tournament, deck2)
-        assertThat(failures).containsOnly("analysis.isUndead()")
+        assertThat(failures).containsOnly("You must have only undead creatures.")
+    }
 
+    @Test
+    fun `when a reason is not given the rule definition is returned`() {
+        val failures: List<String>
+        val tournament = Tournament(id = "t1")
+
+        tournament.rules.add("a.isUndead()")
+
+        val creature = Card(name = "A Khajiit", subtypes = listOf("Khajiit"), type = "Creature")
+        val deck2 = Deck(cards = listOf(creature))
+
+        failures = MVELEngine.checkRules(tournament, deck2)
+        assertThat(failures).containsOnly("a.isUndead()")
+    }
+
+    @Test
+    fun `multiple reasons are rendered`() {
+        val failures: List<String>
+        val tournament = Tournament(id = "t1")
+
+        tournament.rules.add("rareCount == 1")
+        tournament.rules.add("epicCount == 1")
+        tournament.reasons.add("You must have exactly 1 rare card, you had @{rareCount}")
+        tournament.reasons.add("You must have exactly 1 epic card, you had @{epicCount}")
+
+        val creature = Card(name = "A Khajiit", subtypes = listOf("Khajiit"), type = "Creature", rarity = "Common")
+        val deck2 = Deck(cards = listOf(creature))
+
+        failures = MVELEngine.checkRules(tournament, deck2)
+        assertThat(failures).containsExactlyInAnyOrder("You must have exactly 1 rare card, you had 0", "You must have exactly 1 epic card, you had 0")
     }
 }

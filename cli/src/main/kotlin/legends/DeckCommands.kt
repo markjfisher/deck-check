@@ -1,10 +1,9 @@
 package legends
 
-import com.jessecorbett.diskord.api.rest.Embed
-import com.jessecorbett.diskord.api.rest.EmbedAuthor
-import com.jessecorbett.diskord.api.rest.EmbedImage
 import io.elderscrollslegends.Card
 import io.elderscrollslegends.Deck
+import io.elderscrollslegends.Decoder
+import io.elderscrollslegends.DecoderType
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -12,34 +11,53 @@ private val logger = KotlinLogging.logger {}
 enum class DeckCommands(val cmd: String) {
     CMD_HELP("help") {
         override fun run(args: List<String>, mention: String, username: String): ReplyData {
-            val allCommands = values().map { it.cmd }
-            return ReplyData(text = listOf("help: Known commands: ${allCommands.joinToString(", ")}"))
+            val helpText = values().joinToString("\n") { it.help() }
+            return ReplyData(text = listOf("```$helpText```"))
+        }
+
+        override fun help(): String {
+            return "$cmd - shows this help"
         }
     },
     CMD_INFO("info") {
         override fun run(args: List<String>, mention: String, username: String): ReplyData {
             return ReplyData(text = show(args, mention, username, "info"))
         }
+
+        override fun help(): String {
+            return "$cmd - displays summary information about a deck (class, keywords, types, etc. and mana curve.)"
+        }
     },
     CMD_DETAIL("detail") {
         override fun run(args: List<String>, mention: String, username: String): ReplyData {
             return ReplyData(text = show(args, mention, username, "detail"))
         }
+
+        override fun help(): String {
+            return "$cmd - displays detailed information about a deck, as info but with addition creatures/items/support/actions breakdown"
+        }
     },
 
-    CMD_TEST("test") {
+    CMD_VALIDATE("validate") {
         override fun run(args: List<String>, mention: String, username: String): ReplyData {
-            val embed = Embed(
-                title = "embed title",
-                description = "embed description",
-                author = EmbedAuthor(name = username),
-                // image = EmbedImage(url = "https://vignette.wikia.nocookie.net/elderscrolls/images/2/25/Assembled_Conduit.png/revision/latest")
-                image = EmbedImage(url = "attachment:///facepalm_tiny.png")
-            )
-            return ReplyData(text = listOf("An image"), embed = embed)
+            if (args.size != 1) {
+                return ReplyData(text = listOf("$mention: Please supply a single deck code."))
+            }
+
+            val deckCode = args[0]
+            val checkResults = Decoder(DecoderType.DECK).checkImportCode(deckCode)
+            if (!checkResults.first) return ReplyData(text = listOf("$mention: Non valid import code."))
+
+            val returnText = if (checkResults.second.isEmpty()) "$mention: Deck code is valid and has no unknown card codes." else "$mention: Following codes are unknown: ${checkResults.second.joinToString(", ")}"
+            return ReplyData(text = listOf(returnText))
+        }
+
+        override fun help(): String {
+            return "$cmd - validates a deck code is in correct format, and all card codes are known."
         }
     };
 
+    abstract fun help(): String
     abstract fun run(args: List<String>, mention: String, username: String): ReplyData
 
     fun show(args: List<String>, mention: String, username: String, type: String): List<String> {
