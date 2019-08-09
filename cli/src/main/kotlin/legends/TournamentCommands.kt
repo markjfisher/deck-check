@@ -254,7 +254,7 @@ enum class TournamentCommands(val cmd: String) {
         val ign = args[1]
         val deckCode = args[2]
 
-        val deck = Deck.importCode(deckCode)
+        val deck = DeckFixes.fix(Deck.importCode(deckCode))
 
         val failedRules = checkRules(tournament, deck)
         if (failedRules.isEmpty()) {
@@ -302,7 +302,7 @@ enum class TournamentCommands(val cmd: String) {
         }
         val tid = args[0]
         val tournament = BotCheck.tournaments.find { it.id.toLowerCase() == tid.toLowerCase() }
-            ?: return "Error: Cannot check deck code. Tournament with id $tid does not exist"
+            ?: return "$mention Error: Cannot check deck code. Tournament with id $tid does not exist"
 
         val deckCode = args[1]
         val deck = DeckFixes.fix(Deck.importCode(deckCode))

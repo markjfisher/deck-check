@@ -19,7 +19,7 @@ object MVELEngine {
                 .then("valid.addPass($index);")
         }.toSet()
 
-        val analysis = DeckAnalysis(DeckFixes.fix(deck))
+        val analysis = DeckAnalysis(deck)
 
         val valid = TournamentCommands.Valid()
         val facts = Facts()
