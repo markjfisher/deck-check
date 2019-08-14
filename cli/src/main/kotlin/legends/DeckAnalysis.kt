@@ -37,6 +37,7 @@ class DeckAnalysis(private val deck: Deck) {
     val costToCards: Map<Int, List<Card>>
     val costs: List<Int>
     val countByCost: Map<Int, Int>
+    val setToCards: Map<String, List<Card>>
 
     init {
         byRarity = deck.cards
@@ -131,12 +132,20 @@ class DeckAnalysis(private val deck: Deck) {
             acc
         }).toMap()
 
+        setToCards = deck.cards
+            .groupBy { it.set.id }
+            .map { (set, cards) ->
+                (set to cards.toHashSet().toList().sortedBy { it.name })
+            }
+            .toMap()
+
     }
 
     fun creaturesByRarity(rarity: String): List<String> = creatures.filter { it.rarity == rarity }.map { it.name }
     fun actionsByRarity(rarity: String): List<String> = actions.filter { it.rarity == rarity }.map { it.name }
     fun itemsByRarity(rarity: String): List<String> = items.filter { it.rarity == rarity }.map { it.name }
     fun supportsByRarity(rarity: String): List<String> = supports.filter { it.rarity == rarity }.map { it.name }
+    fun bySet(id: String): List<Card> = setToCards.getOrDefault(id, emptyList())
 
     fun raritiesOfType(type: String): List<String> = byType(type).values.map { it.card.rarity }.toHashSet().toList().sorted()
 

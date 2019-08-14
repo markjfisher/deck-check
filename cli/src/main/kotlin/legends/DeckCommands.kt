@@ -103,13 +103,37 @@ enum class DeckCommands(val cmd: String) {
             val actionData = collectCardData(deck, "Action")
             val itemData = collectCardData(deck, "Item")
             val supportData = collectCardData(deck, "Support")
-            val detailCreatures = if (creatureData.isNotBlank()) "$mention\nCreatures:```$creatureData```" else null
-            val detailActions = if (actionData.isNotBlank()) "$mention\nActions:```$actionData```" else null
-            val detailItems = if (itemData.isNotBlank()) "$mention\nItems:```$itemData```" else null
-            val detailSupports = if (supportData.isNotBlank()) "$mention\nSupports:```$supportData```" else null
-            listOf(reply, detailCreatures, detailActions, detailItems, detailSupports).mapNotNull { it }
+            val detailCreatures = splitToList("Creature", mention, creatureData)
+            val detailActions = splitToList("Action", mention, actionData)
+            val detailItems = splitToList("Item", mention, itemData)
+            val detailSupports = splitToList("Support", mention, supportData)
+
+            listOf(reply) + detailCreatures + detailActions + detailItems + detailSupports
         } else {
             listOf(reply)
+        }
+    }
+
+    private fun splitToList(typeName: String, mention: String, data: String): List<String> {
+        return when {
+            data.length > 1900 -> {
+                val lines = data.lines()
+                val parts = mutableListOf<String>()
+                var initialString = "$mention\n${typeName}s:```"
+                var currentString = ""
+                lines.forEach { line ->
+                    currentString += "$initialString$line\n"
+                    initialString = ""
+                    if (currentString.length > 1500) {
+                        parts.add("$currentString```")
+                        currentString = "$mention```"
+                    }
+                }
+                if (currentString != "$mention```") parts.add("$currentString```")
+                parts.toList()
+            }
+            data.isNotBlank() -> listOf("$mention\n${typeName}s:```$data```")
+            else -> emptyList()
         }
     }
 
@@ -118,9 +142,19 @@ enum class DeckCommands(val cmd: String) {
             if (c.name.length > max) c.name.length else max
         }
 
-        val of1Data = byType(deck.of(1), 1, type, maxCardNameLength)
-        val of2Data = byType(deck.of(2), 2, type, maxCardNameLength)
-        val of3Data = byType(deck.of(3), 3, type, maxCardNameLength)
+        val maxTypesLength = deck.cards.fold(0) { max, c ->
+            val len = c.subtypes.joinToString(", ").length
+            if (len > max) len else max
+        }
+
+        val maxSetIdLength = deck.cards.fold(0) { max, c ->
+            val len = c.set.id.length
+            if (len > max) len else max
+        }
+
+        val of1Data = byType(deck.of(1), 1, type, maxCardNameLength, maxTypesLength, maxSetIdLength)
+        val of2Data = byType(deck.of(2), 2, type, maxCardNameLength, maxTypesLength, maxSetIdLength)
+        val of3Data = byType(deck.of(3), 3, type, maxCardNameLength, maxTypesLength, maxSetIdLength)
         return listOf(of1Data, of2Data, of3Data).mapNotNull { if (it.isBlank()) null else it }.joinToString("\n")
     }
 
@@ -128,7 +162,9 @@ enum class DeckCommands(val cmd: String) {
         cards: List<Card>,
         size: Int,
         type: String,
-        maxCardNameLength: Int
+        maxCardNameLength: Int,
+        maxTypesLength: Int,
+        maxSetIdLength: Int
     ): String {
 
         return cards
@@ -139,12 +175,13 @@ enum class DeckCommands(val cmd: String) {
                 val cost = card.cost
                 val power = if (card.power >= 0) "${card.power}" else "-"
                 val health = if (card.health >= 0) "${card.health}" else "-"
-                val longest = maxCardNameLength.toString()
-                val namesString = String.format("%-${longest}s", card.name.take(maxCardNameLength))
-                val typesString = if (card.subtypes.isNotEmpty()) "| ${card.subtypes.joinToString(",")}" else ""
-                val cphString = "[$cost/$power/$health]"
+                val costPowerHealthString = "[$cost/$power/$health]"
+
+                val namesString = String.format("%-${maxCardNameLength}s", card.name.take(maxCardNameLength))
                 val rarityString = String.format("%-6s", card.rarity.take(6))
-                "$size x $namesString $cphString $rarityString $typesString"
+                val setName = String.format("| %-${maxSetIdLength}s", card.set.id)
+                val typesString = if (card.subtypes.isNotEmpty()) String.format("| %-${maxTypesLength}s", card.subtypes.joinToString(",")) else ""
+                "$size x $namesString $costPowerHealthString $rarityString $setName $typesString"
 
             }
             .joinToString("\n")

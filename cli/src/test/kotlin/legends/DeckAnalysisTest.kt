@@ -2,6 +2,7 @@ package legends
 
 import io.elderscrollslegends.Card
 import io.elderscrollslegends.CardCache
+import io.elderscrollslegends.CardSet
 import io.elderscrollslegends.Deck
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
@@ -142,6 +143,21 @@ internal class DeckAnalysisTest {
         (5..30).forEach { i ->
             assertThat(da.countByCost[i]).isEqualTo(0)
         }
+    }
+
+    @Test
+    fun `bySet returns unique cards mapped by set name`() {
+        val creature1 = Card(name = "creature 1", set = CardSet(id = "s1"))
+        val creature2 = Card(name = "creature 2", set = CardSet(id = "s1"))
+        val creature3 = Card(name = "creature 3", set = CardSet(id = "s2"))
+        val creature4 = Card(name = "creature 4", set = CardSet(id = "s3"))
+        val deck = Deck(cards = listOf(creature1, creature1, creature2, creature3, creature3, creature4))
+        val da = DeckAnalysis(deck)
+
+        assertThat(da.bySet("s1")).containsExactlyInAnyOrder(creature1, creature2)
+        assertThat(da.bySet("s2")).containsExactlyInAnyOrder(creature3)
+        assertThat(da.bySet("s3")).containsExactlyInAnyOrder(creature4)
+        assertThat(da.bySet("s4")).isEmpty()
     }
 
     @Test

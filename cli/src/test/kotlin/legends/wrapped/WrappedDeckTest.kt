@@ -35,4 +35,18 @@ internal class WrappedDeckTest {
         assertThat(wd.cardCount("nord CARD 2")).isEqualTo(1)
         assertThat(wd.cardCount("nord card 3")).isEqualTo(0)
     }
+
+    @Test
+    fun `of gives list of unique cards for that count`() {
+        val nord1 = Card(name = "Nord Card 1", subtypes = listOf("Nord"), id = "1")
+        val nord2 = Card(name = "Nord Card 2", subtypes = listOf("Nord"), id = "2")
+
+        val deck = Deck(cards = listOf(nord1, nord1, nord2))
+        val wd = WrappedDeck(deck)
+
+        assertThat(wd.of(0)).isEmpty()
+        assertThat(wd.of(1)).containsExactlyInAnyOrder(nord2)
+        assertThat(wd.of(2)).containsExactlyInAnyOrder(nord1)
+        assertThat(wd.of(3)).isEmpty()
+    }
 }

@@ -1,5 +1,6 @@
 package legends.wrapped
 
+import io.elderscrollslegends.Card
 import io.elderscrollslegends.Deck
 
 class WrappedDeck(private val deck: Deck) {
@@ -10,4 +11,6 @@ class WrappedDeck(private val deck: Deck) {
     fun cardCount(name: String): Int {
         return deck.cards.count { it.name.toLowerCase() == name.toLowerCase() }
     }
+
+    fun of(count: Int): List<Card> = deck.of(count)
 }

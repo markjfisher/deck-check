@@ -3,7 +3,6 @@ package legends
 import io.elderscrollslegends.Deck
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.list
 import legends.MVELEngine.checkRules
 
 enum class TournamentCommands(val cmd: String) {
@@ -20,6 +19,11 @@ enum class TournamentCommands(val cmd: String) {
     CMD_CREATE("create") {
         override fun run(args: List<String>, mention: String, username: String): ReplyData {
             return ReplyData(text = listOf(createTournament(args, username)))
+        }
+    },
+    CMD_CLEAR("clear") {
+        override fun run(args: List<String>, mention: String, username: String): ReplyData {
+            return ReplyData(text = listOf(clearTournament(args, username)))
         }
     },
     CMD_DELETE("delete") {
@@ -54,12 +58,12 @@ enum class TournamentCommands(val cmd: String) {
     },
     CMD_SAVE("save") {
         override fun run(args: List<String>, mention: String, username: String): ReplyData {
-            return ReplyData(text = listOf(saveTournaments(username)))
+            return ReplyData(text = listOf(saveTournament(args, username)))
         }
     },
     CMD_LOAD("load") {
         override fun run(args: List<String>, mention: String, username: String): ReplyData {
-            return ReplyData(text = listOf(loadTournaments(args, username)))
+            return ReplyData(text = listOf(loadTournament(args, username)))
         }
     }
     ;
@@ -73,13 +77,14 @@ enum class TournamentCommands(val cmd: String) {
             | list - list known tournaments
             | create id description - create new tournament
             | delete id - delete tournament
+            | clear - clears all tournaments
             | addRule id rule - add rule to a tournament
             | delRule id rule - remove a rule from tournament
             | register id IGN DeckCode - register with IGN and deck code
             | remove id IGN - remove IGN from registered players
             | check id DeckCode - check a deck against tournament rules
-            | save - outputs serialized value for the tournaments
-            | load "data" - loads serialized data
+            | save id - outputs serialized value for the tournaments
+            | load "data" - loads serialized data, merges into current tournaments
             |
             |Only registered admins can change tournaments
             |```""".trimMargin(),
@@ -168,6 +173,15 @@ enum class TournamentCommands(val cmd: String) {
         return "Created tournament:\n```$tournament```"
     }
 
+    fun clearTournament(args: List<String>, username: String): String {
+        if (!isAdmin(username)) {
+            return "Clear tournament can only be run by admins: ${BotCheck.admins.joinToString(",")}. You are: $username"
+        }
+
+        BotCheck.tournaments.clear()
+        return "Cleared all tournaments"
+    }
+
     fun deleteTournament(args: List<String>, username: String): String {
         if (!isAdmin(username)) {
             return "Delete tournament can only be run by admins: ${BotCheck.admins.joinToString(",")}. You are: $username"
@@ -219,16 +233,22 @@ enum class TournamentCommands(val cmd: String) {
         return if (BotCheck.tournaments.isNotEmpty()) BotCheck.tournaments.joinToString("\n") { "```$it```" } else "No tournaments defined."
     }
 
-    fun saveTournaments(username: String): String {
+    fun saveTournament(args: List<String>, username: String): String {
         if (!isAdmin(username)) {
             return "Save tournament can only be run by admins: ${BotCheck.admins.joinToString(", ")}. You are: $username"
         }
+        if (args.isEmpty()) {
+            return "Invalid save tournament command, please supply tournament id"
+        }
+        val tid = args[0]
+        val tournament = BotCheck.tournaments.find { it.id == tid }
+            ?: return "Error: Cannot save tournament. Tournament with id $tid does not exist"
 
         val json = Json(JsonConfiguration.Stable)
-        return "```${json.stringify(Tournament.serializer().list, BotCheck.tournaments)}```"
+        return "```${json.stringify(Tournament.serializer(), tournament)}```"
     }
 
-    fun loadTournaments(args: List<String>, username: String): String {
+    fun loadTournament(args: List<String>, username: String): String {
         if (!isAdmin(username)) {
             return "Load tournament can only be run by admins: ${BotCheck.admins.joinToString(", ")}. You are: $username"
         }
@@ -237,10 +257,10 @@ enum class TournamentCommands(val cmd: String) {
         }
         val data = endArgsAsString(args)
         val json = Json(JsonConfiguration.Stable)
-        val importData = json.parse(Tournament.serializer().list, data)
-        BotCheck.tournaments.clear()
-        BotCheck.tournaments.addAll(importData)
-        return "Loaded ${importData.size} tournaments"
+        val importData = json.parse(Tournament.serializer(), data)
+        BotCheck.tournaments
+        BotCheck.tournaments.add(importData)
+        return "Loaded tournament $importData"
     }
 
     fun registerPlayer(args: List<String>, mention: String): String {
