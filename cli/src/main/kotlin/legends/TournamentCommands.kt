@@ -287,14 +287,14 @@ enum class TournamentCommands(val cmd: String) {
             tournament.addPlayer(ign = ign, deck = deckCode)
             return """
                 |$mention
-                |Deck: `$deckCode`
+                |Deck: `${deckCode.take(9)}...`
                 |Tournament: `${tournament.description}`
                 |Passed all rules, player $ign registered.
                 |""".trimMargin()
         } else {
             return """
                 |$mention
-                |Deck: `$deckCode`
+                |Deck: `${deckCode.take(9)}...`
                 |Tournament: `${tournament.description}`
                 |Failed on rules:
                 |```${failedRules.joinToString("\n")}
@@ -339,14 +339,14 @@ enum class TournamentCommands(val cmd: String) {
         val failedRules = checkRules(tournament, deck)
         return if (failedRules.isNotEmpty()) """
             |$mention
-            |Deck: `$deckCode`
+            |Deck: `${deckCode.take(9)}...`
             |Tournament: `${tournament.description}`
             |Failed on rules:
             |```${failedRules.joinToString("\n")}
             |```""".trimMargin()
         else """
             |$mention
-            |Deck: `$deckCode`
+            |Deck: `${deckCode.take(9)}...`
             |Tournament: `${tournament.description}`
             |Passed all rules!
             |""".trimMargin()
