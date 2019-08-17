@@ -4,6 +4,9 @@ import io.elderscrollslegends.Deck
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import legends.MVELEngine.checkRules
+import mu.KotlinLogging
+
+private val logger = KotlinLogging.logger {}
 
 enum class TournamentCommands(val cmd: String) {
     CMD_HELP("help") {
@@ -43,7 +46,7 @@ enum class TournamentCommands(val cmd: String) {
     },
     CMD_REGISTER("register") {
         override fun run(args: List<String>, mention: String, username: String): ReplyData {
-            return ReplyData(text = listOf(registerPlayer(args, mention)))
+            return ReplyData(text = listOf(registerPlayer(args, mention, username)))
         }
     },
     CMD_REMOVE("remove") {
@@ -53,7 +56,7 @@ enum class TournamentCommands(val cmd: String) {
     },
     CMD_CHECK("check") {
         override fun run(args: List<String>, mention: String, username: String): ReplyData {
-            return ReplyData(text = listOf(checkTournamentDeck(args, mention)))
+            return ReplyData(text = listOf(checkTournamentDeck(args, mention, username)))
         }
     },
     CMD_SAVE("save") {
@@ -263,16 +266,19 @@ enum class TournamentCommands(val cmd: String) {
         return "Loaded tournament $importData"
     }
 
-    fun registerPlayer(args: List<String>, mention: String): String {
+    fun registerPlayer(args: List<String>, mention: String, username: String): String {
         if (args.size != 3) {
             return "Invalid register tournament command, please supply: ID, IGN, Deck Code"
         }
         val tid = args[0]
+        val tournamentIdList = BotCheck.tournaments.joinToString(", ") { it.id }
         val tournament = BotCheck.tournaments.find { it.id == tid }
-            ?: return "Error: Cannot register player. Tournament with id $tid does not exist"
+            ?: return "$mention Error: Cannot register player. Tournament with id $tid does not exist (pick from $tournamentIdList)"
 
         val ign = args[1]
         val deckCode = args[2]
+
+        logger.info { "Register: user: $username, ign: $ign, tournament: $tid, deck-code: $deckCode" }
 
         val deck = DeckFixes.fix(Deck.importCode(deckCode))
 
@@ -316,16 +322,19 @@ enum class TournamentCommands(val cmd: String) {
         }
     }
 
-    fun checkTournamentDeck(args: List<String>, mention: String): String {
+    fun checkTournamentDeck(args: List<String>, mention: String, username: String): String {
         if (args.size != 2) {
             return "Invalid check tournament command, please supply an ID and deck code"
         }
         val tid = args[0]
+        val tournamentIdList = BotCheck.tournaments.joinToString(", ") { it.id }
         val tournament = BotCheck.tournaments.find { it.id.toLowerCase() == tid.toLowerCase() }
-            ?: return "$mention Error: Cannot check deck code. Tournament with id $tid does not exist"
+            ?: return "$mention Error: Cannot check deck code. Tournament with id $tid does not exist (pick from $tournamentIdList)"
 
         val deckCode = args[1]
         val deck = DeckFixes.fix(Deck.importCode(deckCode))
+
+        logger.info { "Check: user: $username, tournament: $tid, deck-code: $deckCode" }
 
         val failedRules = checkRules(tournament, deck)
         return if (failedRules.isNotEmpty()) """
