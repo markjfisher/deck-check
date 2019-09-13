@@ -85,10 +85,10 @@ class DeckAnalysis(private val deck: Deck) {
         items = itemsMap.values.map { it.card }
         supports = supportsMap.values.map { it.card }
 
-        creatureCount = creaturesMap.map {it.value.count}.sum()
-        actionsCount = actionsMap.map {it.value.count}.sum()
-        itemsCount = itemsMap.map {it.value.count}.sum()
-        supportsCount = supportsMap.map {it.value.count}.sum()
+        creatureCount = creaturesMap.map { it.value.count }.sum()
+        actionsCount = actionsMap.map { it.value.count }.sum()
+        itemsCount = itemsMap.map { it.value.count }.sum()
+        supportsCount = supportsMap.map { it.value.count }.sum()
 
         c1 = deck.of(1).size
         c2 = deck.of(2).size
@@ -147,33 +147,18 @@ class DeckAnalysis(private val deck: Deck) {
     fun supportsByRarity(rarity: String): List<String> = supports.filter { it.rarity == rarity }.map { it.name }
     fun bySet(id: String): List<Card> = setToCards.getOrDefault(id, emptyList())
 
-    fun raritiesOfType(type: String): List<String> = byType(type).values.map { it.card.rarity }.toHashSet().toList().sorted()
+    fun raritiesOfType(type: String): List<String> =
+        byType(type).values.map { it.card.rarity }.toHashSet().toList().sorted()
 
-    fun creaturesOfSubtype(type: String): List<String> = creatures.filter { it.subtypes == listOf(type) }.map { it.name }
+    fun creaturesOfSubtype(type: String): List<String> =
+        creatures.filter { it.subtypes == listOf(type) }.map { it.name }
 
     fun isUndead(): Boolean {
-        val isStandardUndead = creatures.all{ card ->
-            listOf("Skeleton", "Spirit", "Vampire", "Mummy").contains(card.subtypes.first())
+        // check that every card contains at least one of the undead types
+        val undeadTypes = setOf("Skeleton", "Spirit", "Vampire", "Mummy")
+        return creatures.all { card ->
+            card.subtypes.any { undeadTypes.contains(it) }
         }
-
-        val allowedKhajiit = hashSetOf("Tenarr Zalviit Lurker", "Tenarr Zalviit Nightstalker", "Dro-m'Athra Reaper")
-        val allowedBeast = hashSetOf("Death Hound")
-        val allowedDragon = hashSetOf("Skeletal Dragon")
-        val allowedFactotum = hashSetOf("Reflective Automaton")
-
-        val allowedOtherUndead = allowedKhajiit + allowedBeast + allowedDragon + allowedFactotum
-
-        val khajiitCards = creaturesOfSubtype("Khajiit").toHashSet()
-        val beastCards = creaturesOfSubtype("Khajiit").toHashSet()
-        val dragonCards = creaturesOfSubtype("Khajiit").toHashSet()
-        val factotumCards = creaturesOfSubtype("Khajiit").toHashSet()
-
-        val nonStandardUndeadCards = khajiitCards + beastCards + dragonCards + factotumCards
-
-        val nonStandardCardsAreUndead = nonStandardUndeadCards.minus(allowedOtherUndead).isEmpty()
-
-        return isStandardUndead || (!isStandardUndead && nonStandardCardsAreUndead)
-
     }
 
     data class CardCount(

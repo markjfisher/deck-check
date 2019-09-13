@@ -150,10 +150,13 @@ class MVELEngineTest {
 
     @Test
     fun `is undead checks`() {
-        val creature1 = Card(name = "Tenarr Zalviit Lurker", subtypes = listOf("Khajiit"), type = "Creature")
-        val creature2 = Card(name = "Death Hound", subtypes = listOf("Beast"), type = "Creature")
-        val creature3 = Card(name = "Reflective Automaton", subtypes = listOf("Factotum"), type = "Creature")
-        val creature4 = Card(name = "Skeletal Dragon", subtypes = listOf("Dragon"), type = "Creature")
+        val creature1 = Card(name = "Tenarr Zalviit Lurker", subtypes = listOf("Khajiit", "Vampire"), type = "Creature")
+        val creature2 = Card(name = "Death Hound", subtypes = listOf("Beast", "Vampire"), type = "Creature")
+        val creature3 = Card(
+            name = "Reflective Automaton",
+            subtypes = listOf("Animal", "Argonian", "Ash Creature", "Beast", "Breton", "Centaur", "Chaurus", "Daedra", "Dark Elf", "Defense", "Dragon", "Dreugh", "Dwemer", "Elytra", "Fabricant", "Factotum", "Falmer", "Fish", "Gargoyle", "Giant", "Goblin", "God", "Grummite", "Harpy", "High Elf", "Imp", "Imperfect", "Imperial", "Insect", "Khajiit", "Kwama", "Lurcher", "Mammoth", "Mantikora", "Minotaur", "Mudcrab", "Mummy", "Nereid", "Netch", "Nord", "Ogre", "Orc", "Pastry", "Reachman", "Redguard", "Reptile", "Skeever", "Skeleton", "Spider", "Spirit", "Spriggan", "Troll", "Vampire", "Wamasu", "Werewolf", "Wolf", "Wood Elf", "Wraith"), type = "Creature"
+        )
+        val creature4 = Card(name = "Skeletal Dragon", subtypes = listOf("Dragon", "Skeleton"), type = "Creature")
         val creature5 = Card(name = "A vampire", subtypes = listOf("Vampire"), type = "Creature")
         val deck1 = Deck(cards = listOf(creature1, creature2, creature3, creature4, creature5))
 
