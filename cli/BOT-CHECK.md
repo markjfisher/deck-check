@@ -1,5 +1,5 @@
 Bot Check is a discord bot for displaying information about a deck
-directly in a discord channel
+directly in a discord channel. Also supports tournament creating and checking.
 
 To enable, set the following value
 
@@ -20,3 +20,11 @@ This can be done using one of:
    ```properties
    deck-check.bot.token=your-token-here
    ```
+
+# Building
+
+To build a distribution release run:
+
+    ./gradlew distZip -Pbot-check
+
+and copy the zip from `cli/build/distributions/bot-check-<VERSION>.zip`
