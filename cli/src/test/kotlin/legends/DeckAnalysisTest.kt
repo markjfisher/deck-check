@@ -196,15 +196,4 @@ internal class DeckAnalysisTest {
         assertThat(manaToCardCount[7]).isEqualTo(4)
     }
 
-    @Test
-    @Disabled("Runs against live API")
-    fun `missing cards test`() {
-        CardCache.load()
-        val deck = Deck.importCode("SPABvMAAAA")
-        val da = DeckAnalysis(deck)
-
-        assertThat(da.creatureCount).isEqualTo(1)
-    }
-
-    // TODO: more tests
 }
