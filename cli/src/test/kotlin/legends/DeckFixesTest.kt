@@ -25,4 +25,13 @@ class DeckFixesTest {
         assertThat(card.soulTrap).isEqualTo("20")
         assertThat(card.rarity).isEqualTo("Rare")
     }
+
+    @Test
+    fun `Suthay Bootlegger is a khajiit`() {
+        val cards = listOf(Card(name = "Suthay Bootlegger"))
+        val fixedDeck = DeckFixes.fix(Deck(cards))
+        val card = fixedDeck.cards.first()
+        assertThat(card.name).isEqualTo("Suthay Bootlegger")
+        assertThat(card.subtypes).containsOnly("Khajiit")
+    }
 }
