@@ -164,6 +164,39 @@ internal class DeckAnalysisTest {
     }
 
     @Test
+    fun `mana to card count for curve`() {
+        val creature1a = Card(name = "creature 1a", cost = 0)
+        val creature1b = Card(name = "creature 1b", cost = 0)
+        val creature2a = Card(name = "creature 2a", cost = 1)
+        val creature2b = Card(name = "creature 2b", cost = 1)
+        val creature3a = Card(name = "creature 3a", cost = 2)
+        val creature4a = Card(name = "creature 4a", cost = 3)
+        val creature7 = Card(name = "creature 7", cost = 7)
+        val creature8 = Card(name = "creature 8", cost = 8)
+        val creature9 = Card(name = "creature 9", cost = 9)
+        val deck = Deck(cards = listOf(creature1a, creature1a, creature1b, creature2a, creature2b, creature3a, creature3a, creature4a, creature7, creature7, creature8, creature9))
+        val da = DeckAnalysis(deck)
+
+        // Actual costs
+        val costToCountMap = da.costToCountMap
+        assertThat(costToCountMap[0]).isEqualTo(3)
+        assertThat(costToCountMap[1]).isEqualTo(2)
+        assertThat(costToCountMap[2]).isEqualTo(2)
+        assertThat(costToCountMap[3]).isEqualTo(1)
+        assertThat(costToCountMap[7]).isEqualTo(2)
+        assertThat(costToCountMap[8]).isEqualTo(1)
+        assertThat(costToCountMap[9]).isEqualTo(1)
+
+        // Grouped for curve
+        val manaToCardCount = da.manaCurve
+        assertThat(manaToCardCount[0]).isEqualTo(3)
+        assertThat(manaToCardCount[1]).isEqualTo(2)
+        assertThat(manaToCardCount[2]).isEqualTo(2)
+        assertThat(manaToCardCount[3]).isEqualTo(1)
+        assertThat(manaToCardCount[7]).isEqualTo(4)
+    }
+
+    @Test
     @Disabled("Runs against live API")
     fun `missing cards test`() {
         CardCache.load()

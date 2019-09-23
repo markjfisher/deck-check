@@ -32,7 +32,8 @@ class DeckAnalysis(private val deck: Deck) {
     val c3: Int
     val totalUnique: Int
     val totalCards: Int
-    val manaToCardCount: Map<Int, Int>
+    val costToCountMap: Map<Int, Int>
+    val manaCurve: Map<Int, Int>
     val subtypes: List<String>
     val costToCards: Map<Int, List<Card>>
     val costs: List<Int>
@@ -97,20 +98,20 @@ class DeckAnalysis(private val deck: Deck) {
         totalUnique = c1 + c2 + c3
         totalCards = c1 + c2 * 2 + c3 * 3
 
-        val costToCountMap = deck.cards
+        costToCountMap = deck.cards
             .groupBy { it.cost }
             .toSortedMap()
             .map { entry ->
                 val cost = entry.key
                 val count = entry.value
                     .groupBy { card -> card.name }
-                    .map { it.value.first() }
-                    .count()
+                    .map { it.value.size }
+                    .sum()
                 (cost to count)
             }
             .toMap()
 
-        manaToCardCount = (0..30).fold(mutableMapOf(), { acc, cost ->
+        manaCurve = (0..30).fold(mutableMapOf(), { acc, cost ->
             val x = if (cost < 8) cost else 7
             val y = costToCountMap[cost] ?: 0
             val sevenPlus = acc.getOrDefault(7, 0)
@@ -195,12 +196,12 @@ class DeckAnalysis(private val deck: Deck) {
     }
 
     fun createManaString(): String {
-        val maxValue = manaToCardCount.values.max()!!
+        val maxValue = manaCurve.values.max()!!
         val maxValueLength = "$maxValue".length
         val increment = maxValue / 20.0
         val maxLabelLength = 4
 
-        return manaToCardCount.map { (cost, count) ->
+        return manaCurve.map { (cost, count) ->
             val barChunks = ((count * 8) / increment).toInt().div(8)
             val remainder = ((count * 8) / increment).toInt().rem(8)
 
