@@ -76,12 +76,14 @@ enum class DeckCommands(val cmd: String) {
                 val line2 = String.format("%-10s: %-5d   %-10s: %-5d", "Rare", da.rareCount, "Items", da.itemsCount)
                 val line3 = String.format("%-10s: %-5d   %-10s: %-5d", "Epic", da.epicCount, "Support", da.supportsCount)
                 val line4 = String.format("%-10s: %-5d   %-10s: %-5d", "Legendary", da.legendaryCount, "Creatures", da.creatureCount)
+                val line5 = String.format("%-10s: %-10d", "Soulgems", da.soulGemCost)
 
                 """|$mention : $deckCode
                 |```$line1
                 |$line2
                 |$line3
                 |$line4
+                |$line5
                 |
                 |Class    : ${da.deckClassName} [${da.attributesText}]
                 |Keywords : ${da.keywordsText}

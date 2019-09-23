@@ -1,11 +1,9 @@
 package legends
 
 import io.elderscrollslegends.Card
-import io.elderscrollslegends.CardCache
 import io.elderscrollslegends.CardSet
 import io.elderscrollslegends.Deck
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 internal class DeckAnalysisTest {
@@ -146,6 +144,18 @@ internal class DeckAnalysisTest {
         (5..30).forEach { i ->
             assertThat(da.countByCost[i]).isEqualTo(0)
         }
+    }
+
+    @Test
+    fun `Soul gem cost`() {
+        val creature1 = Card(name = "creature 1", soulSummon = "100")
+        val creature2 = Card(name = "creature 2", soulSummon = "200")
+        val creature3 = Card(name = "creature 3", soulSummon = "300")
+        val creature4 = Card(name = "creature 4", soulSummon = "")
+        val deck = Deck(cards = listOf(creature1, creature1, creature2, creature3, creature3, creature4))
+        val da = DeckAnalysis(deck)
+
+        assertThat(da.soulGemCost).isEqualTo(1000)
     }
 
     @Test

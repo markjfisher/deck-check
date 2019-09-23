@@ -39,6 +39,7 @@ class DeckAnalysis(private val deck: Deck) {
     val costs: List<Int>
     val countByCost: Map<Int, Int>
     val setToCards: Map<String, List<Card>>
+    val soulGemCost: Int
 
     init {
         byRarity = deck.cards
@@ -139,6 +140,8 @@ class DeckAnalysis(private val deck: Deck) {
                 (set to cards.toHashSet().toList().sortedBy { it.name })
             }
             .toMap()
+
+        soulGemCost = deck.cards.map { if (it.soulSummon.isEmpty()) 0 else it.soulSummon.toInt() }.sum()
 
     }
 
