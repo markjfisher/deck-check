@@ -108,4 +108,18 @@ class RealAPITests {
         }
     }
 
+    @Test
+    @Disabled("Runs against live API")
+    fun `Find creatures without a subtype`() {
+        println("Reading cards....")
+        val cards = Card.all()
+        println("... done")
+
+        val nonSubtypedCards = cards.filter { it.type == "Creature" }
+            .filter { it.subtypes.isEmpty() }
+
+        nonSubtypedCards.forEach {
+            println("${it.name} : https://api.elderscrollslegends.io/v1/cards?name=${it.name.replace(" ", "%20")}")
+        }
+    }
 }
