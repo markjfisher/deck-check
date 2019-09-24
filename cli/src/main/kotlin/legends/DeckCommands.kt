@@ -37,6 +37,25 @@ enum class DeckCommands(val cmd: String) {
             return "$cmd - displays detailed information about a deck, as info but with addition creatures/items/support/actions breakdown"
         }
     },
+    CMD_IMG("image") {
+        override fun help(): String {
+            return "$cmd - creates a graphical image of the deck."
+        }
+
+        override fun run(args: List<String>, mention: String, username: String): ReplyData {
+            if (args.size != 1) {
+                return ReplyData(text = listOf("$mention: Please supply a single deck code."))
+            }
+
+            val deckCode = args[0]
+            logger.info { "User: $username asked for image for code: $deckCode" }
+            val deck = DeckFixes.fix(Deck.importCode(deckCode))
+
+            val imageData = DeckImage.from(deck, mention, username)
+
+            return ReplyData(text = listOf("Sorry, not implemented yet... coming soon"))
+        }
+    },
 
     CMD_VALIDATE("validate") {
         override fun run(args: List<String>, mention: String, username: String): ReplyData {

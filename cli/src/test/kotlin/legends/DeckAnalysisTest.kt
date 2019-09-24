@@ -6,7 +6,7 @@ import io.elderscrollslegends.Deck
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-internal class DeckAnalysisTest {
+class DeckAnalysisTest {
     @Test
     fun `rarity counts`() {
         val commonCards = listOf(Card(name = "common card 1", rarity = "Common"))
@@ -156,6 +156,14 @@ internal class DeckAnalysisTest {
         val da = DeckAnalysis(deck)
 
         assertThat(da.soulGemCost).isEqualTo(1000)
+    }
+
+    @Test
+    fun `Non-integer soulSummon`() {
+        val creature1 = Card(name = "creature 1", soulSummon = "Not an int")
+        val deck = Deck(cards = listOf(creature1))
+        val da = DeckAnalysis(deck)
+        assertThat(da.soulGemCost).isEqualTo(0)
     }
 
     @Test

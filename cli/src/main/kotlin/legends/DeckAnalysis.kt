@@ -4,6 +4,7 @@ import io.elderscrollslegends.Card
 import io.elderscrollslegends.Deck
 
 import legends.DeckAnalysis.ClassColour.*
+import java.lang.Exception
 
 class DeckAnalysis(private val deck: Deck) {
     val byRarity: Map<String, List<Card>>
@@ -141,7 +142,10 @@ class DeckAnalysis(private val deck: Deck) {
             }
             .toMap()
 
-        soulGemCost = deck.cards.map { if (it.soulSummon.isEmpty()) 0 else it.soulSummon.toInt() }.sum()
+        soulGemCost = deck.cards.map {
+            if (it.soulSummon.isEmpty()) 0
+            else { try { it.soulSummon.toInt() } catch (_: Exception) { 0 } }
+        }.sum()
 
     }
 
