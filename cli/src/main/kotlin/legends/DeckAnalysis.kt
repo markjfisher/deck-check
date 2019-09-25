@@ -4,10 +4,12 @@ import io.elderscrollslegends.Card
 import io.elderscrollslegends.Deck
 
 import legends.DeckAnalysis.ClassColour.*
+import java.awt.Color
 import java.lang.Exception
 
 class DeckAnalysis(private val deck: Deck) {
     val byRarity: Map<String, List<Card>>
+    val deckClass: DeckClass
     val deckClassName: String
     val attributesText: String
 
@@ -41,6 +43,7 @@ class DeckAnalysis(private val deck: Deck) {
     val countByCost: Map<Int, Int>
     val setToCards: Map<String, List<Card>>
     val soulGemCost: Int
+    val cardCountSorted: List<CardCount>
 
     init {
         byRarity = deck.cards
@@ -59,7 +62,7 @@ class DeckAnalysis(private val deck: Deck) {
             .toSet()
 
         val withoutNeutral = allClassColours - GREY
-        val deckClass = DeckClass
+        deckClass = DeckClass
             .values()
             .find { it.classColours == withoutNeutral } ?: DeckClass.NEUTRAL
 
@@ -121,7 +124,7 @@ class DeckAnalysis(private val deck: Deck) {
             acc
         })
 
-        subtypes = deck.cards.map { it.subtypes }.flatten().toHashSet().toList()
+        subtypes = deck.cards.map { it.subtypes }.flatten().toHashSet().toList().sorted()
 
         costs = deck.cards.map { it.cost }.toHashSet().toList().sorted()
 
@@ -146,6 +149,15 @@ class DeckAnalysis(private val deck: Deck) {
             if (it.soulSummon.isEmpty()) 0
             else { try { it.soulSummon.toInt() } catch (_: Exception) { 0 } }
         }.sum()
+
+        // Sorts all the cards by cost, then name, and then groups the same card into a count to give List<CardCount>
+        // so that each card is represented only once in the list, but its count is still captured in the ordering
+        cardCountSorted = deck.cards
+            .sortedWith(compareBy<Card>{ it.cost }.thenBy { it.name })
+            .groupBy { Pair(it.cost, it.name) }
+            .map {
+                CardCount(count = it.value.size, card = it.value.first())
+            }
 
     }
 
@@ -226,13 +238,13 @@ class DeckAnalysis(private val deck: Deck) {
 
     }
 
-    enum class ClassColour {
-        GREEN,
-        RED,
-        BLUE,
-        YELLOW,
-        PURPLE,
-        GREY
+    enum class ClassColour(val hexColor: Color) {
+        GREEN(Color(0x00, 0xa9, 0x25, 0x40)),
+        RED(Color(0xff, 0x59, 0x37, 0x40)),
+        BLUE(Color(0x08, 0x7b, 0xeb, 0x40)),
+        YELLOW(Color(0xfb, 0xc5, 0x00, 0x40)),
+        PURPLE(Color(0x9a, 0x48, 0xe4, 0x40)),
+        GREY(Color(0xce, 0xba, 0x84, 0x40))
     }
 
     enum class ClassAbility(val classColour: ClassColour) {

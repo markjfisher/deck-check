@@ -75,7 +75,6 @@ object DeckFixes {
             imageUrl = imageUrl,
             id = id
         )
-        return card
     }
 
 }

@@ -3,6 +3,7 @@ package legends
 import io.elderscrollslegends.Card
 import io.elderscrollslegends.CardSet
 import io.elderscrollslegends.Deck
+import legends.DeckAnalysis.CardCount
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -212,6 +213,35 @@ class DeckAnalysisTest {
         assertThat(manaToCardCount[2]).isEqualTo(2)
         assertThat(manaToCardCount[3]).isEqualTo(1)
         assertThat(manaToCardCount[7]).isEqualTo(4)
+    }
+
+    @Test
+    fun `sorted cards list comes back by cost then name`() {
+        val c1 = Card(name = "b0", cost = 0)
+        val c2 = Card(name = "a0", cost = 0)
+        val c3 = Card(name = "a1", cost = 1)
+        val c4 = Card(name = "b1", cost = 1)
+        val c5 = Card(name = "c2", cost = 2)
+        val c6 = Card(name = "a2", cost = 2)
+        val c7 = Card(name = "b2", cost = 2)
+        val c8 = Card(name = "x3", cost = 3)
+        val c9 = Card(name = "m4", cost = 4)
+        val deck = Deck(cards = listOf(c1, c1, c2, c2, c3, c4, c5, c5, c6, c7, c8, c9))
+
+        assertThat(DeckAnalysis(deck).cardCountSorted).isEqualTo(
+            listOf(
+                CardCount(2, c2),
+                CardCount(2, c1),
+                CardCount(1, c3),
+                CardCount(1, c4),
+                CardCount(1, c6),
+                CardCount(1, c7),
+                CardCount(2, c5),
+                CardCount(1, c8),
+                CardCount(1, c9)
+            )
+        )
+
     }
 
 }

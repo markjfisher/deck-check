@@ -15,3 +15,5 @@ dist
 .attach_pid*
 .DS_Store
 
+cli/src/test/resources/images
+cli/src/main/resources/images

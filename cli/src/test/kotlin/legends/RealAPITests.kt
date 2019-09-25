@@ -82,26 +82,26 @@ class RealAPITests {
         val empireOfCyrodiil = ygp
         val guildsworn = rby
 
-        listOf(greenCards, yellowCards, redCards, blueCards, purpleCards, greyCards).forEach { cards ->
-            cards.sortedWith(compareBy<Card>{ it.cost }.thenBy { it.rarity }.thenBy { it.name })
+        listOf(greenCards, yellowCards, redCards, blueCards, purpleCards, greyCards).forEach { cs ->
+            cs.sortedWith(compareBy<Card>{ it.cost }.thenBy { it.rarity }.thenBy { it.name })
                 .forEach { card ->
                     println(String.format("%s|%d|%s|%s", card.name, card.cost, card.rarity, card.attributes.joinToString(",")))
                 }
         }
-        listOf(archer, assassin, battlemage, crusader, mage, monk, scout, sorcerer, spellsword, warrior).forEach { cards ->
-            cards.sortedWith(compareBy<Card>{ it.cost }.thenBy { it.rarity }.thenBy { it.name })
+        listOf(archer, assassin, battlemage, crusader, mage, monk, scout, sorcerer, spellsword, warrior).forEach { cs ->
+            cs.sortedWith(compareBy<Card>{ it.cost }.thenBy { it.rarity }.thenBy { it.name })
                 .forEach { card ->
                     println(String.format("%s|%d|%s|%s", card.name, card.cost, card.rarity, card.attributes.joinToString(",")))
                 }
         }
-        listOf(houseDagoth, houseHlaalu, houseRedoran, houseTelvanni, tribunalTemple).forEach { cards ->
-            cards.sortedWith(compareBy<Card>{ it.cost }.thenBy { it.rarity }.thenBy { it.name })
+        listOf(houseDagoth, houseHlaalu, houseRedoran, houseTelvanni, tribunalTemple).forEach { cs ->
+            cs.sortedWith(compareBy<Card>{ it.cost }.thenBy { it.rarity }.thenBy { it.name })
                 .forEach { card ->
                     println(String.format("%s|%d|%s|%s", card.name, card.cost, card.rarity, card.attributes.joinToString(",")))
                 }
         }
-        listOf(aldemeriDominion, daggerfallCovenant, ebonheartPact, empireOfCyrodiil, guildsworn).forEach { cards ->
-            cards.sortedWith(compareBy<Card>{ it.cost }.thenBy { it.rarity }.thenBy { it.name })
+        listOf(aldemeriDominion, daggerfallCovenant, ebonheartPact, empireOfCyrodiil, guildsworn).forEach { cs ->
+            cs.sortedWith(compareBy<Card>{ it.cost }.thenBy { it.rarity }.thenBy { it.name })
                 .forEach { card ->
                     println(String.format("%s|%d|%s|%s", card.name, card.cost, card.rarity, card.attributes.joinToString(",")))
                 }
