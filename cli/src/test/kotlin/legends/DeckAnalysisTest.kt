@@ -241,7 +241,53 @@ class DeckAnalysisTest {
                 CardCount(1, c9)
             )
         )
-
     }
 
+    @Test
+    fun `prophecy count`() {
+        val c1 = Card(name = "1", keywords = listOf("x", "Prophecy"))
+        val c2 = Card(name = "2", keywords = listOf("x", ""))
+        val c3 = Card(name = "3", keywords = listOf("x", "Prophecy"))
+        val c4 = Card(name = "4", keywords = listOf("x", ""))
+        val c5 = Card(name = "5", keywords = listOf("x", "Prophecy"))
+        val c6 = Card(name = "6", keywords = listOf("x", ""))
+        val c7 = Card(name = "7", keywords = listOf("x", "Prophecy"))
+        val c8 = Card(name = "8", keywords = listOf("x", ""))
+        val c9 = Card(name = "9", keywords = listOf("x", "Prophecy"))
+        val deck = Deck(cards = listOf(c1, c1, c2, c2, c3, c4, c5, c5, c6, c7, c8, c9))
+
+        assertThat(DeckAnalysis(deck).prophecyCount).isEqualTo(7)
+    }
+
+    @Test
+    fun `attributes amalgamated from all cards`() {
+        val c1 = Card(name = "1", attributes = listOf("Strength"))
+        val c2 = Card(name = "2", attributes = listOf("Agility"))
+        val c3 = Card(name = "3", attributes = listOf("Intelligence"))
+        val c4 = Card(name = "4", attributes = listOf("Strength", "Agility"))
+        val c5 = Card(name = "5", attributes = listOf("Strength", "Intelligence"))
+        val c6 = Card(name = "6", attributes = listOf("Agility", "Intelligence"))
+        val c7 = Card(name = "7", attributes = listOf("Strength", "Agility", "Intelligence"))
+        val c8 = Card(name = "8")
+        val c9 = Card(name = "9")
+        val deck = Deck(cards = listOf(c1, c1, c2, c2, c3, c4, c5, c5, c6, c7, c8, c9))
+
+        assertThat(DeckAnalysis(deck).attributes).containsExactlyEntriesOf(mapOf("Strength" to 6, "Agility" to 5, "Intelligence" to 5))
+    }
+
+    @Test
+    fun `keywords amalgamated from all cards`() {
+        val c1 = Card(name = "1", keywords = listOf("k1"))
+        val c2 = Card(name = "2", keywords = listOf("k2"))
+        val c3 = Card(name = "3", keywords = listOf("k3"))
+        val c4 = Card(name = "4", keywords = listOf("k1", "k2"))
+        val c5 = Card(name = "5", keywords = listOf("k1", "k3"))
+        val c6 = Card(name = "6", keywords = listOf("k2", "k3"))
+        val c7 = Card(name = "7", keywords = listOf("k1", "k2", "k3"))
+        val c8 = Card(name = "8")
+        val c9 = Card(name = "9")
+        val deck = Deck(cards = listOf(c1, c1, c2, c2, c3, c4, c5, c5, c6, c7, c8, c9))
+
+        assertThat(DeckAnalysis(deck).keywords).containsExactlyInAnyOrder("k1", "k2", "k3")
+    }
 }

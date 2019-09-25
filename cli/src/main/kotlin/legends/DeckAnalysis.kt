@@ -11,8 +11,10 @@ class DeckAnalysis(private val deck: Deck) {
     val byRarity: Map<String, List<Card>>
     val deckClass: DeckClass
     val deckClassName: String
-    val attributesText: String
 
+    val attributes: Map<String, Int>
+    val keywords: List<String>
+    val attributesText: String
     val keywordsText: String
     val legendaryCount: Int
     val epicCount: Int
@@ -30,6 +32,7 @@ class DeckAnalysis(private val deck: Deck) {
     val actionsCount: Int
     val itemsCount: Int
     val supportsCount: Int
+    val prophecyCount: Int
     val c1: Int
     val c2: Int
     val c3: Int
@@ -73,8 +76,10 @@ class DeckAnalysis(private val deck: Deck) {
             .split(" ")
             .joinToString(" ") { it.capitalize() }
 
-        attributesText = groupAndCountAsText { it.attributes }
-        keywordsText = groupAndCountAsText { it.keywords }
+        attributes = groupAndCount { it.attributes }
+        keywords = deck.cards.flatMap { it.keywords }.toHashSet().toList().sorted()
+        attributesText = mapToText(groupAndCount { it.attributes })
+        keywordsText = mapToText(groupAndCount { it.keywords })
 
         legendaryCount = byRarity["Legendary"]?.size ?: 0
         epicCount = byRarity["Epic"]?.size ?: 0
@@ -95,6 +100,13 @@ class DeckAnalysis(private val deck: Deck) {
         actionsCount = actionsMap.map { it.value.count }.sum()
         itemsCount = itemsMap.map { it.value.count }.sum()
         supportsCount = supportsMap.map { it.value.count }.sum()
+
+        prophecyCount = deck
+            .cards
+            .flatMap { it.keywords }
+            .groupBy { it }
+            .map { (k, v) -> k to v.size }
+            .toMap()["Prophecy"] ?: 0
 
         c1 = deck.of(1).size
         c2 = deck.of(2).size
@@ -186,17 +198,19 @@ class DeckAnalysis(private val deck: Deck) {
         val card: Card
     )
 
-    private fun groupAndCountAsText(mapper: (card: Card) -> List<String>): String {
+    private fun groupAndCount(mapper: (card: Card) -> List<String>): Map<String, Int> {
         return deck
             .cards
             .flatMap { mapper(it) }
             .groupBy { it }
             .map { (k, v) -> k to v.size }
             .toMap()
-            .map { (name, count) ->
-                "$name: $count"
-            }.joinToString(", ")
+    }
 
+    private fun mapToText(map: Map<String, Int>): String {
+        return map.map { (name, count) ->
+            "$name: $count"
+        }.joinToString(", ")
     }
 
     private fun byType(type: String): Map<String, CardCount> {
