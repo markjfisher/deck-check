@@ -2,6 +2,7 @@ package legends
 
 import io.elderscrollslegends.Card
 import io.elderscrollslegends.Deck
+import legends.DeckAnalysis.ClassAbility
 import legends.gfx.*
 import legends.gfx.Point
 import java.awt.*
@@ -77,7 +78,6 @@ object DeckImage {
                 val imageData = getImageData(card)
                 val cutdownImage = copySubImage(imageData, 70, 140, imageData.width - 150, 110)
                 val scaledImage = scaleImage(cutdownImage, 0.5, 0.5)
-                println("scaled: ${scaledImage.width}, ${scaledImage.height}")
 
                 // CLOUD on left, CARD on right, dissolve between the two
 
@@ -91,28 +91,30 @@ object DeckImage {
                 val grayImage: BufferedImage = Toolkit.getDefaultToolkit().createImage(producer).toBufferedImage()
 
                 // 3. Merge
-                val mergedImage = GfxFade.mergeImages(cloudImage, grayImage, x2-x1, circRadius*2 - 4, 0.65f)
-
-                ig2.clipRect(x1, y-circRadius+2, x2-x1, circRadius*2 - 4)
-                ig2.drawImage(mergedImage, x1, y-circRadius+2, null)
-
-                ig2.clip = null
+                val mergedImage = GfxFade.mergeImages(cloudImage, scaledImage, x2-x1, circRadius*2 - 4, 0.65f)
 
                 ////////////////////////////////////////////////////////////////////////////////////
                 // FILLED BOX WITH CARD COLOURS
                 // The alpha channel of the colours determine the opacity of the colour
                 val cc = card.attributes
-                    .map { DeckAnalysis.ClassAbility.valueOf(it.toUpperCase()).classColour }
+                    .map { ClassAbility.valueOf(it.toUpperCase()).classColour }
                     .sortedBy { it.name }
 
-                val colourBoxWidth = x2 - x1
+                val colourBoxWidth = (x2 - x1) * 14 / 20
                 val colourBoxHeight = circRadius * 2 - 4
-                val fadeImage: BufferedImage = when(cc.size) {
+                val colourOverlay: BufferedImage = when(cc.size) {
                     1 -> GfxFade.createColourFade(cc[0].hexColor, cc[0].hexColor, colourBoxWidth, colourBoxHeight)
-                    2 -> GfxFade.createColourFade(cc[0].hexColor, cc[1].hexColor, colourBoxWidth, colourBoxHeight, 0.1f)
+                    2 -> GfxFade.createColourFade(cc[0].hexColor, cc[1].hexColor, colourBoxWidth, colourBoxHeight,0.1f)
                     else -> GfxFade.createColourFade(cc[0].hexColor, cc[1].hexColor, cc[2].hexColor, colourBoxWidth, colourBoxHeight, 0.1f)
                 }
-                ig2.drawImage(fadeImage, x1, y - circRadius + 2, null)
+
+                // now combine colourImage and mergedImage
+                val finalImage = GfxFade.mergeImages(colourOverlay, mergedImage, x2-x1, circRadius*2 - 4, 0.55f, mergePercent = 0.15f)
+
+                ig2.clipRect(x1, y-circRadius+2, x2-x1, circRadius*2 - 4)
+                ig2.drawImage(finalImage, x1, y-circRadius+2, null)
+
+                ig2.clip = null
 
                 ////////////////////////////////////////////////////////////////////////////////////
                 // CONNECTING PARALLEL LINES (will be overwritten by circles)
@@ -204,7 +206,7 @@ object DeckImage {
         // DECK CLASS
         // First get the abilities into the correct order as per the class colour order
         val attr = da.deckClass.classColours.map { DeckAnalysis.ClassAbility.fromColour(it) }.toMutableList()
-        if (da.attributes.containsKey("Neutral")) attr.add(DeckAnalysis.ClassAbility.NEUTRAL)
+        if (da.attributes.containsKey("Neutral")) attr.add(ClassAbility.NEUTRAL)
 
         val attributeCount = attr.map {
             it.name.toLowerCase() to da.attributes[it.name.toLowerCase().capitalize()]
@@ -306,11 +308,9 @@ object DeckImage {
         val localResource = this::class.java.classLoader.getResource("images/cards/${sanitisedName}.png")
         return when {
             localResource != null -> {
-                println("reading image from file resource for ${card.name}")
                 ImageIO.read(localResource)
             }
             card.imageUrl != "" -> {
-                println("reading image from externam url ${card.imageUrl}")
                 ImageIO.read(URL(card.imageUrl))
             }
             else -> throw IOException("No URL available for card $card")

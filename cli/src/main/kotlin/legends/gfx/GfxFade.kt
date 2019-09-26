@@ -97,4 +97,5 @@ object GfxFade {
         g.dispose()
         return bi
     }
+
 }

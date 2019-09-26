@@ -9,7 +9,7 @@ import java.lang.Exception
 
 class DeckAnalysis(private val deck: Deck) {
     companion object {
-        const val colourAlpha = 0x2f
+        const val colourAlpha = 0x4f
     }
 
     val byRarity: Map<String, List<Card>>
@@ -260,7 +260,7 @@ class DeckAnalysis(private val deck: Deck) {
     enum class ClassColour(val hexColor: Color) {
         GREEN(Color(0x00, 0x80, 0x00, colourAlpha)),
         RED(Color(0x80, 0x00, 0x00, colourAlpha)),
-        BLUE(Color(0x00, 0x00, 0x80, colourAlpha)),
+        BLUE(Color(0x00, 0x00, 0xa0, colourAlpha)),
         YELLOW(Color(0xff, 0xff, 0x00, colourAlpha)),
         PURPLE(Color(0x80, 0x00, 0x80, colourAlpha)),
         GREY(Color(0xc0, 0xc0, 0xc0, colourAlpha))

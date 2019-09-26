@@ -60,12 +60,23 @@ class DeckImageTest {
         println("loading cards...")
         CardCache.load()
         println("... finished")
+        // SPAMsIrggOqolHhFnNajuxqktDeiADmooEcOATuznAbDcxgstmqyhnnwqNfBfPkveDlYqBlImlqT
 //        val deck = Deck.importCode("SPAGnRsjeklabzrzAEkXgJjnrPAMgUkYjSmToZpqdMfrkpfqxehO")
 //        val deck = Deck.importCode("SPAKustKdVugmPhYgDeMsMhMAKujePklniarrHnHaHmgulAPdWgPdBoVnjjNgQdlprcltEjHgvdUvQ")
-        val deck = Deck.importCode("SPAGiPoPrkwbeigpAGfWvGeQwydEgBATmRjkwUmGbDcxmopexbdLhnqzfBfPkvvVlYlIqT")
+//        val deck = Deck.importCode("SPAGiPoPrkwbeigpAGfWvGeQwydEgBATmRjkwUmGbDcxmopexbdLhnqzfBfPkvvVlYlIqT")
+
+        // triple card:
 //        val deck = Deck.importCode("SPAMsIrggOqolHhFnNajuxqktDeiADmooEcOATuznAbDcxgstmqyhnnwqNfBfPkveDlYqBlImlqT")
+
+        // multi-card
+//        val deck = Deck.importCode("SPAGmxhdumwAaAqcAKnMkgswkVnLbOcIdynrdhAIdIsUwfoewdrCxcjH")
+
+        // Abell random deck
+        val deck = Deck.importCode("SPAJqhnLnNrRlwdKoOvKjXAHakrQoMrCbQeZfUAJdIoecIcwwIaKjHnrcy")
+
+
 //        val deck = Deck.importCode("SPAJqhnLnNrRlwdKoOvKjXAHakrQoMrCbQeZfUAJdIoecIcwwIaKjHnrcy")
-        DeckImage.from(deck, "foo", "Fenrock")
+        DeckImage.from(deck, "foo", "AbellWild")
 
     }
 
