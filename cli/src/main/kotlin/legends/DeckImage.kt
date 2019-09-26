@@ -16,8 +16,7 @@ import javax.swing.GrayFilter
 import kotlin.math.min
 import java.awt.image.AffineTransformOp
 import java.awt.geom.AffineTransform
-
-
+import java.io.ByteArrayOutputStream
 
 object DeckImage {
     private const val fontName = "FreeSans"
@@ -30,12 +29,7 @@ object DeckImage {
         val topBlockHeight = 180
         val heightGap = 3
         val bottomMargin = 20
-
         val summaryTitleHeight = 50
-
-//        GraphicsEnvironment.getLocalGraphicsEnvironment().allFonts.forEach {
-//            println(it)
-//        }
 
         val da = DeckAnalysis(deck)
         val numCards = da.totalUnique
@@ -81,16 +75,11 @@ object DeckImage {
 
                 // CLOUD on left, CARD on right, dissolve between the two
 
-                // 1. CLOUD
+                // CLOUD
                 val cloudResource = this::class.java.classLoader.getResource("images/cloud-grey.png")
                 val cloudImage = ImageIO.read(cloudResource)
 
-                // 2. CARD
-                val grayFilter = GrayFilter(true, 5)
-                val producer = FilteredImageSource(scaledImage.source, grayFilter)
-                val grayImage: BufferedImage = Toolkit.getDefaultToolkit().createImage(producer).toBufferedImage()
-
-                // 3. Merge
+                // Merge
                 val mergedImage = GfxFade.mergeImages(cloudImage, scaledImage, x2-x1, circRadius*2 - 4, 0.65f)
 
                 ////////////////////////////////////////////////////////////////////////////////////
@@ -230,9 +219,10 @@ object DeckImage {
         ig2.paint = Color(0xd2, 0xcb, 0xfe)
         ig2.drawString("(${da.deckClassName})", attIndex * 108 - 8, topBlockHeight - 26)
 
-        ImageIO.write(bi, "PNG", File("/tmp/out1.png"))
+        val baos = ByteArrayOutputStream()
+        ImageIO.write(bi, "PNG", baos)
 
-        return ByteArray(0)
+        return baos.toByteArray()
     }
 
     private fun copySubImage(image: BufferedImage, x: Int, y: Int, w: Int, h: Int): BufferedImage {

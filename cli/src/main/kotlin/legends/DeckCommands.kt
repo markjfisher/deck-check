@@ -1,10 +1,12 @@
 package legends
 
+import com.jessecorbett.diskord.util.toFileData
 import io.elderscrollslegends.Card
 import io.elderscrollslegends.Deck
 import io.elderscrollslegends.Decoder
 import io.elderscrollslegends.DecoderType
 import mu.KotlinLogging
+import java.lang.Integer.min
 
 private val logger = KotlinLogging.logger {}
 
@@ -52,8 +54,12 @@ enum class DeckCommands(val cmd: String) {
             val deck = DeckFixes.fix(Deck.importCode(deckCode))
 
             val imageData = DeckImage.from(deck, mention, username)
+            val fileName = "${username.substring(0, min(username.length, 10))}-${deckCode.substring(2,12)}.png"
+                .filter { it.isLetterOrDigit() || it == '.' || it == '-' }
 
-            return ReplyData(text = listOf("Sorry, not implemented yet... coming soon"))
+            val fileData = imageData.toFileData(fileName)
+
+            return ReplyData(text = listOf("$mention - here is your deck for $deckCode"), fileData = fileData)
         }
     },
 

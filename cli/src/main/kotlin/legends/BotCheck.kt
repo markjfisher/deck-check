@@ -8,6 +8,7 @@ import com.jessecorbett.diskord.dsl.bot
 import com.jessecorbett.diskord.dsl.command
 import com.jessecorbett.diskord.dsl.commands
 import com.jessecorbett.diskord.util.mention
+import com.jessecorbett.diskord.util.sendFile
 import com.jessecorbett.diskord.util.words
 import com.natpryce.konfig.*
 import io.elderscrollslegends.CardCache
@@ -53,13 +54,17 @@ object BotCheck {
                         val deckCommand = DeckCommands.values().find { it.cmd == deckArgs[0] } ?: DeckCommands.CMD_HELP
                         val replyData = deckCommand.run(deckArgs.drop(1), author.mention, author.username)
 
-                        replyData.text.forEach { text ->
-                            channel.createMessage(
-                                CreateMessage(
-                                    content = text,
-                                    embed = replyData.embed
+                        if (replyData.fileData != null) {
+                            channel.sendFile(data = replyData.fileData, comment = replyData.text.first())
+                        } else {
+                            replyData.text.forEach { text ->
+                                channel.createMessage(
+                                    CreateMessage(
+                                        content = text,
+                                        embed = replyData.embed
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
 
