@@ -8,6 +8,10 @@ import java.awt.Color
 import java.lang.Exception
 
 class DeckAnalysis(private val deck: Deck) {
+    companion object {
+        const val colourAlpha = 0x2f
+    }
+
     val byRarity: Map<String, List<Card>>
     val deckClass: DeckClass
     val deckClassName: String
@@ -67,7 +71,7 @@ class DeckAnalysis(private val deck: Deck) {
         val withoutNeutral = allClassColours - GREY
         deckClass = DeckClass
             .values()
-            .find { it.classColours == withoutNeutral } ?: DeckClass.NEUTRAL
+            .find { it.classColours.containsAll(withoutNeutral) } ?: DeckClass.NEUTRAL
 
         deckClassName = deckClass
             .name
@@ -252,13 +256,14 @@ class DeckAnalysis(private val deck: Deck) {
 
     }
 
+
     enum class ClassColour(val hexColor: Color) {
-        GREEN(Color(0x00, 0xa9, 0x25, 0x40)),
-        RED(Color(0xff, 0x59, 0x37, 0x40)),
-        BLUE(Color(0x08, 0x7b, 0xeb, 0x40)),
-        YELLOW(Color(0xfb, 0xc5, 0x00, 0x40)),
-        PURPLE(Color(0x9a, 0x48, 0xe4, 0x40)),
-        GREY(Color(0xce, 0xba, 0x84, 0x40))
+        GREEN(Color(0x00, 0x80, 0x00, colourAlpha)),
+        RED(Color(0x80, 0x00, 0x00, colourAlpha)),
+        BLUE(Color(0x00, 0x00, 0x80, colourAlpha)),
+        YELLOW(Color(0xff, 0xff, 0x00, colourAlpha)),
+        PURPLE(Color(0x80, 0x00, 0x80, colourAlpha)),
+        GREY(Color(0xc0, 0xc0, 0xc0, colourAlpha))
     }
 
     enum class ClassAbility(val classColour: ClassColour) {
@@ -267,40 +272,46 @@ class DeckAnalysis(private val deck: Deck) {
         INTELLIGENCE(BLUE),
         WILLPOWER(YELLOW),
         ENDURANCE(PURPLE),
-        NEUTRAL(GREY)
+        NEUTRAL(GREY);
+
+        companion object {
+            fun fromColour(classColour: ClassColour): ClassAbility {
+                return values().find { it.classColour == classColour } ?: NEUTRAL
+            }
+        }
     }
 
-    enum class DeckClass(val classColours: Set<ClassColour>) {
-        NEUTRAL(emptySet()),
+    enum class DeckClass(val classColours: List<ClassColour>) {
+        NEUTRAL(emptyList()),
 
-        SINGLE_GREEN(setOf(GREEN)),
-        SINGLE_RED(setOf(RED)),
-        SINGLE_BLUE(setOf(BLUE)),
-        SINGLE_YELLOW(setOf(YELLOW)),
-        SINGLE_PURPLE(setOf(PURPLE)),
+        SINGLE_GREEN(listOf(GREEN)),
+        SINGLE_RED(listOf(RED)),
+        SINGLE_BLUE(listOf(BLUE)),
+        SINGLE_YELLOW(listOf(YELLOW)),
+        SINGLE_PURPLE(listOf(PURPLE)),
 
-        ARCHER(setOf(GREEN, RED)),
-        ASSASSIN(setOf(GREEN, BLUE)),
-        BATTLEMAGE(setOf(BLUE, RED)),
-        CRUSADER(setOf(RED, YELLOW)),
-        MAGE(setOf(BLUE, YELLOW)),
-        MONK(setOf(GREEN, YELLOW)),
-        SCOUT(setOf(GREEN, PURPLE)),
-        SORCERER(setOf(PURPLE, BLUE)),
-        SPELLSWORD(setOf(PURPLE, YELLOW)),
-        WARRIOR(setOf(PURPLE, RED)),
+        ARCHER(listOf(GREEN, RED)),
+        ASSASSIN(listOf(GREEN, BLUE)),
+        BATTLEMAGE(listOf(BLUE, RED)),
+        CRUSADER(listOf(RED, YELLOW)),
+        MAGE(listOf(BLUE, YELLOW)),
+        MONK(listOf(GREEN, YELLOW)),
+        SCOUT(listOf(GREEN, PURPLE)),
+        SORCERER(listOf(PURPLE, BLUE)),
+        SPELLSWORD(listOf(PURPLE, YELLOW)),
+        WARRIOR(listOf(PURPLE, RED)),
 
-        HOUSE_DAGOTH(setOf(GREEN, BLUE, RED)),
-        HOUSE_HLAALU(setOf(RED, YELLOW, GREEN)),
-        HOUSE_REDORAN(setOf(RED, YELLOW, PURPLE)),
-        HOUSE_TELVANNI(setOf(BLUE, GREEN, PURPLE)),
-        TRIBUNAL_TEMPLE(setOf(BLUE, YELLOW, PURPLE)),
+        HOUSE_DAGOTH(listOf(GREEN, BLUE, RED)),
+        HOUSE_HLAALU(listOf(RED, YELLOW, GREEN)),
+        HOUSE_REDORAN(listOf(RED, YELLOW, PURPLE)),
+        HOUSE_TELVANNI(listOf(BLUE, GREEN, PURPLE)),
+        TRIBUNAL_TEMPLE(listOf(BLUE, YELLOW, PURPLE)),
 
-        ALDEMERI_DOMINION(setOf(BLUE, YELLOW, GREEN)),
-        DAGGERFALL_COVENANT(setOf(PURPLE, RED, BLUE)),
-        EBONHEART_PACT(setOf(GREEN, PURPLE, RED)),
-        EMPIRE_OF_CYRODIIL(setOf(YELLOW, GREEN, PURPLE)),
-        GUILDSWORN(setOf(RED, BLUE, YELLOW))
+        ALDEMERI_DOMINION(listOf(BLUE, YELLOW, GREEN)),
+        DAGGERFALL_COVENANT(listOf(PURPLE, RED, BLUE)),
+        EBONHEART_PACT(listOf(GREEN, PURPLE, RED)),
+        EMPIRE_OF_CYRODIIL(listOf(YELLOW, GREEN, PURPLE)),
+        GUILDSWORN(listOf(RED, BLUE, YELLOW))
     }
 
 

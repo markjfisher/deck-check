@@ -60,9 +60,12 @@ class DeckImageTest {
         println("loading cards...")
         CardCache.load()
         println("... finished")
+//        val deck = Deck.importCode("SPAGnRsjeklabzrzAEkXgJjnrPAMgUkYjSmToZpqdMfrkpfqxehO")
+//        val deck = Deck.importCode("SPAKustKdVugmPhYgDeMsMhMAKujePklniarrHnHaHmgulAPdWgPdBoVnjjNgQdlprcltEjHgvdUvQ")
+        val deck = Deck.importCode("SPAGiPoPrkwbeigpAGfWvGeQwydEgBATmRjkwUmGbDcxmopexbdLhnqzfBfPkvvVlYlIqT")
 //        val deck = Deck.importCode("SPAMsIrggOqolHhFnNajuxqktDeiADmooEcOATuznAbDcxgstmqyhnnwqNfBfPkveDlYqBlImlqT")
-        val deck = Deck.importCode("SPAKustKdVugmPhYgDeMsMhMAKujePklniarrHnHaHmgulAPdWgPdBoVnjjNgQdlprcltEjHgvdUvQ")
-        DeckImage.from(deck, "foo", "AbellWild")
+//        val deck = Deck.importCode("SPAJqhnLnNrRlwdKoOvKjXAHakrQoMrCbQeZfUAJdIoecIcwwIaKjHnrcy")
+        DeckImage.from(deck, "foo", "Fenrock")
 
     }
 

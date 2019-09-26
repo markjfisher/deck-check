@@ -5,7 +5,6 @@ import io.elderscrollslegends.Deck
 import legends.gfx.*
 import legends.gfx.Point
 import java.awt.*
-import java.awt.geom.Point2D
 import java.awt.image.BufferedImage
 import java.awt.image.FilteredImageSource
 import java.io.File
@@ -14,6 +13,10 @@ import java.net.URL
 import javax.imageio.ImageIO
 import javax.swing.GrayFilter
 import kotlin.math.min
+import java.awt.image.AffineTransformOp
+import java.awt.geom.AffineTransform
+
+
 
 object DeckImage {
     private const val fontName = "FreeSans"
@@ -72,56 +75,44 @@ object DeckImage {
                 // IMAGES
                 ////////////////////////////////////////////////////////////////////////////////////
                 val imageData = getImageData(card)
-                val cutdownImage = imageData.getSubimage(55, 162, 300, 60)
-
-                val p1 = Point2D.Float(x1.toFloat(), y.toFloat())
-                val p2 = Point2D.Float(x2.toFloat(), y.toFloat())
+                val cutdownImage = copySubImage(imageData, 70, 140, imageData.width - 150, 110)
+                val scaledImage = scaleImage(cutdownImage, 0.5, 0.5)
+                println("scaled: ${scaledImage.width}, ${scaledImage.height}")
 
                 // CLOUD on left, CARD on right, dissolve between the two
 
                 // 1. CLOUD
-//                val dist = floatArrayOf(0.0f, 1.0f)
-//                val colors = listOf(Color(0, 0, 0, 0xff), Color(0, 0, 0, 0x7f), Color(0, 0, 0, 0xff)).toTypedArray()
-//                val imagesGradient = LinearGradientPaint(p1, p2, dist, colors)
-//                val cloudResource = this::class.java.classLoader.getResource("images/cloud-grey.png")
-//                val cloudImage = ImageIO.read(cloudResource)
+                val cloudResource = this::class.java.classLoader.getResource("images/cloud-grey.png")
+                val cloudImage = ImageIO.read(cloudResource)
 
                 // 2. CARD
-                val grayFilter = GrayFilter(true, 15)
-                val producer = FilteredImageSource(cutdownImage.source, grayFilter)
-                val grayImage2 = Toolkit.getDefaultToolkit().createImage(producer)
+                val grayFilter = GrayFilter(true, 5)
+                val producer = FilteredImageSource(scaledImage.source, grayFilter)
+                val grayImage: BufferedImage = Toolkit.getDefaultToolkit().createImage(producer).toBufferedImage()
+
+                // 3. Merge
+                val mergedImage = GfxFade.mergeImages(cloudImage, grayImage, x2-x1, circRadius*2 - 4, 0.65f)
 
                 ig2.clipRect(x1, y-circRadius+2, x2-x1, circRadius*2 - 4)
-
-                // ig2.composite = AlphaComposite.DstOut
-//                ig2.drawImage(grayImage2, x1 + ((x2-x1)/3.5).toInt(), y-circRadius+2, null)
-                ig2.drawImage(grayImage2, x1, y-circRadius+2, null)
+                ig2.drawImage(mergedImage, x1, y-circRadius+2, null)
 
                 ig2.clip = null
 
                 ////////////////////////////////////////////////////////////////////////////////////
-                // FILLED BOX WITH CARD COLOUR
+                // FILLED BOX WITH CARD COLOURS
+                // The alpha channel of the colours determine the opacity of the colour
                 val cc = card.attributes
                     .map { DeckAnalysis.ClassAbility.valueOf(it.toUpperCase()).classColour }
                     .sortedBy { it.name }
 
-                val gradientPaint: Paint = when(cc.size) {
-                    1 -> {
-                        cc[0].hexColor
-                    }
-                    2 -> {
-                        val dist = floatArrayOf(0.0f, 1.0f)
-                        val colors = listOf(cc[0].hexColor, cc[1].hexColor).toTypedArray()
-                        LinearGradientPaint(p1, p2, dist, colors)
-                    }
-                    else -> {
-                        val dist = floatArrayOf(0.0f, 0.5f, 1.0f)
-                        val colors = listOf(cc[0].hexColor, cc[1].hexColor, cc[2].hexColor).toTypedArray()
-                        LinearGradientPaint(p1, p2, dist, colors)
-                    }
+                val colourBoxWidth = x2 - x1
+                val colourBoxHeight = circRadius * 2 - 4
+                val fadeImage: BufferedImage = when(cc.size) {
+                    1 -> GfxFade.createColourFade(cc[0].hexColor, cc[0].hexColor, colourBoxWidth, colourBoxHeight)
+                    2 -> GfxFade.createColourFade(cc[0].hexColor, cc[1].hexColor, colourBoxWidth, colourBoxHeight, 0.1f)
+                    else -> GfxFade.createColourFade(cc[0].hexColor, cc[1].hexColor, cc[2].hexColor, colourBoxWidth, colourBoxHeight, 0.1f)
                 }
-                ig2.paint = gradientPaint
-                ig2.fillRect(x1, y - circRadius + 2, x2 - x1, circRadius * 2 - 4)
+                ig2.drawImage(fadeImage, x1, y - circRadius + 2, null)
 
                 ////////////////////////////////////////////////////////////////////////////////////
                 // CONNECTING PARALLEL LINES (will be overwritten by circles)
@@ -177,8 +168,11 @@ object DeckImage {
                     ig2.drawString(countMessage, x2 + wCount / 2 - 14, y + hCount / 2 - 2)
                 }
 
+                ////////////////////////////////////////////////////////////////////////////////////
+                // NAME
+                ////////////////////////////////////////////////////////////////////////////////////
                 val nameMessage = card.name.substring(0, min(card.name.length, 26))
-                ig2.font = Font(fontName, Font.BOLD, 20)
+                ig2.font = Font(fontName, Font.PLAIN, 20)
                 val fmName = ig2.fontMetrics
                 val hName = fmName.ascent
                 ig2.paint = Color.WHITE
@@ -193,26 +187,35 @@ object DeckImage {
         displayUser(ig2, username)
 
         // Summary details
-        displayText(ig2, "Creatures:", "${da.creatureCount}", 2, 0, 5, width, summaryTitleHeight)
-        displayText(ig2, "Soulgems:", "${da.soulGemCost}", 2, 1, 5, width, summaryTitleHeight)
-        displayText(ig2, "Count:", "${da.totalCards}", 2, 2, 5, width, summaryTitleHeight)
+        displayDeckDetailValue(ig2, "Creatures:", "${da.creatureCount}", 2, 0, 5, width, summaryTitleHeight)
+        displayDeckDetailValue(ig2, "Soulgems:", "${da.soulGemCost}", 2, 1, 5, width, summaryTitleHeight)
+        displayDeckDetailValue(ig2, "Count:", "${da.totalCards}", 2, 2, 5, width, summaryTitleHeight)
 
-        displayText(ig2, "Actions:", "${da.actionsCount}", 3, 0, 5, width, summaryTitleHeight)
-        displayText(ig2, "Items:", "${da.itemsCount}", 3, 1, 5, width, summaryTitleHeight)
-        displayText(ig2, "Supports:", "${da.supportsCount}", 3, 2, 5, width, summaryTitleHeight)
-        displayText(ig2, "Prophecies:", "${da.prophecyCount}", 3, 3, 5, width, summaryTitleHeight)
+        displayDeckDetailValue(ig2, "Actions:", "${da.actionsCount}", 3, 0, 5, width, summaryTitleHeight)
+        displayDeckDetailValue(ig2, "Items:", "${da.itemsCount}", 3, 1, 5, width, summaryTitleHeight)
+        displayDeckDetailValue(ig2, "Supports:", "${da.supportsCount}", 3, 2, 5, width, summaryTitleHeight)
+        displayDeckDetailValue(ig2, "Prophecies:", "${da.prophecyCount}", 3, 3, 5, width, summaryTitleHeight)
 
-        displayText(ig2, "Commons:", "${da.commonCount}", 4, 0, 5, width, summaryTitleHeight)
-        displayText(ig2, "Rares:", "${da.rareCount}", 4, 1, 5, width, summaryTitleHeight)
-        displayText(ig2, "Epics:", "${da.epicCount}", 4, 2, 5, width, summaryTitleHeight)
-        displayText(ig2, "Legendaries:", "${da.legendaryCount}", 4, 3, 5, width, summaryTitleHeight)
+        displayDeckDetailValue(ig2, "Commons:", "${da.commonCount}", 4, 0, 5, width, summaryTitleHeight)
+        displayDeckDetailValue(ig2, "Rares:", "${da.rareCount}", 4, 1, 5, width, summaryTitleHeight)
+        displayDeckDetailValue(ig2, "Epics:", "${da.epicCount}", 4, 2, 5, width, summaryTitleHeight)
+        displayDeckDetailValue(ig2, "Legendaries:", "${da.legendaryCount}", 4, 3, 5, width, summaryTitleHeight)
+
+        // DECK CLASS
+        // First get the abilities into the correct order as per the class colour order
+        val attr = da.deckClass.classColours.map { DeckAnalysis.ClassAbility.fromColour(it) }.toMutableList()
+        if (da.attributes.containsKey("Neutral")) attr.add(DeckAnalysis.ClassAbility.NEUTRAL)
+
+        val attributeCount = attr.map {
+            it.name.toLowerCase() to da.attributes[it.name.toLowerCase().capitalize()]
+        }.toMap()
 
         ig2.font = Font(fontName, Font.PLAIN, 30)
         var attIndex = 0
-        da.attributes.forEach { (attribute, count) ->
-            val iconResource = this::class.java.classLoader.getResource("images/${attribute.toLowerCase()}-50.png")
+        attributeCount.forEach { (attribute, count) ->
+            val iconResource = this::class.java.classLoader.getResource("images/${attribute}-50.png")
             val iconImage = ImageIO.read(iconResource)
-            val x = 5 + attIndex++ * 100
+            val x = 5 + attIndex++ * 108
             val y = topBlockHeight - 60
             ig2.drawImage(iconImage, x, y, null)
 
@@ -220,9 +223,43 @@ object DeckImage {
             ig2.drawString("$count", x + 55, y + 35)
         }
 
+        // Deck class name
+        ig2.font = Font(fontName, Font.PLAIN, 28)
+        ig2.paint = Color(0xd2, 0xcb, 0xfe)
+        ig2.drawString("(${da.deckClassName})", attIndex * 108 - 8, topBlockHeight - 26)
+
         ImageIO.write(bi, "PNG", File("/tmp/out1.png"))
 
         return ByteArray(0)
+    }
+
+    private fun copySubImage(image: BufferedImage, x: Int, y: Int, w: Int, h: Int): BufferedImage {
+        // imageData.getSubimage(20, 130, imageData.width - 100, 110)
+        val new = BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
+        val g = new.createGraphics()
+        g.drawImage(image.getSubimage(x, y, w, h), 0, 0, null)
+        g.dispose()
+        return new
+    }
+
+    private fun scaleImage(image: BufferedImage, scaleX: Double, scaleY: Double): BufferedImage {
+        val after = BufferedImage((image.width * scaleX).toInt(), (image.height * scaleY).toInt(), BufferedImage.TYPE_INT_ARGB)
+        val at = AffineTransform.getScaleInstance(scaleX, scaleY)
+        val scaleOp = AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR)
+        return scaleOp.filter(image, after)
+    }
+
+    private fun Image.toBufferedImage(): BufferedImage {
+        if (this is BufferedImage) {
+            return this
+        }
+        val bufferedImage = BufferedImage(this.getWidth(null), this.getHeight(null), BufferedImage.TYPE_INT_ARGB)
+
+        val graphics2D = bufferedImage.createGraphics()
+        graphics2D.drawImage(this, 0, 0, null)
+        graphics2D.dispose()
+
+        return bufferedImage
     }
 
     private fun displayUser(g: Graphics2D, name: String) {
@@ -243,7 +280,7 @@ object DeckImage {
         g.drawString(name, 5, 5 + hName)
     }
 
-    private fun displayText(g: Graphics2D, title: String, text: String, x: Int, y: Int, numCols: Int, width: Int, titleMargin: Int) {
+    private fun displayDeckDetailValue(g: Graphics2D, title: String, text: String, x: Int, y: Int, numCols: Int, width: Int, titleMargin: Int) {
         val fontSize = 30
 
         // Title

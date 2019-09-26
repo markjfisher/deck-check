@@ -3,7 +3,7 @@ package legends
 import io.elderscrollslegends.Card
 import io.elderscrollslegends.CardSet
 import io.elderscrollslegends.Deck
-import legends.DeckAnalysis.CardCount
+import legends.DeckAnalysis.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -289,5 +289,58 @@ class DeckAnalysisTest {
         val deck = Deck(cards = listOf(c1, c1, c2, c2, c3, c4, c5, c5, c6, c7, c8, c9))
 
         assertThat(DeckAnalysis(deck).keywords).containsExactlyInAnyOrder("k1", "k2", "k3")
+    }
+
+    @Test
+    fun `deck class tests`() {
+        val cRed = Card(name = "red", attributes = listOf("Strength"))
+        val cBlue = Card(name = "blue", attributes = listOf("Intelligence"))
+        val cYellow = Card(name = "yellow", attributes = listOf("Willpower"))
+        val cPurple = Card(name = "purple", attributes = listOf("Endurance"))
+        val cGreen = Card(name = "green", attributes = listOf("Agility"))
+        val cGray = Card(name = "gray", attributes = listOf("Neutral"))
+        assertThat(DeckAnalysis(Deck(cards = listOf(cRed))).deckClass).isEqualTo(DeckAnalysis.DeckClass.SINGLE_RED)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cBlue))).deckClass).isEqualTo(DeckAnalysis.DeckClass.SINGLE_BLUE)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cYellow))).deckClass).isEqualTo(DeckAnalysis.DeckClass.SINGLE_YELLOW)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cPurple))).deckClass).isEqualTo(DeckAnalysis.DeckClass.SINGLE_PURPLE)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cGreen))).deckClass).isEqualTo(DeckAnalysis.DeckClass.SINGLE_GREEN)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cGray))).deckClass).isEqualTo(DeckAnalysis.DeckClass.NEUTRAL)
+
+        assertThat(DeckAnalysis(Deck(cards = listOf(cGreen, cRed))).deckClass).isEqualTo(DeckAnalysis.DeckClass.ARCHER)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cGreen, cBlue))).deckClass).isEqualTo(DeckAnalysis.DeckClass.ASSASSIN)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cBlue, cRed))).deckClass).isEqualTo(DeckAnalysis.DeckClass.BATTLEMAGE)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cRed, cYellow))).deckClass).isEqualTo(DeckAnalysis.DeckClass.CRUSADER)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cBlue, cYellow))).deckClass).isEqualTo(DeckAnalysis.DeckClass.MAGE)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cGreen, cYellow))).deckClass).isEqualTo(DeckAnalysis.DeckClass.MONK)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cGreen, cPurple))).deckClass).isEqualTo(DeckAnalysis.DeckClass.SCOUT)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cPurple, cBlue))).deckClass).isEqualTo(DeckAnalysis.DeckClass.SORCERER)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cPurple, cYellow))).deckClass).isEqualTo(DeckAnalysis.DeckClass.SPELLSWORD)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cPurple, cRed))).deckClass).isEqualTo(DeckAnalysis.DeckClass.WARRIOR)
+
+        assertThat(DeckAnalysis(Deck(cards = listOf(cGreen, cBlue, cRed))).deckClass).isEqualTo(DeckAnalysis.DeckClass.HOUSE_DAGOTH)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cRed, cYellow, cGreen))).deckClass).isEqualTo(DeckAnalysis.DeckClass.HOUSE_HLAALU)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cRed, cYellow, cPurple))).deckClass).isEqualTo(DeckAnalysis.DeckClass.HOUSE_REDORAN)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cBlue, cGreen, cPurple))).deckClass).isEqualTo(DeckAnalysis.DeckClass.HOUSE_TELVANNI)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cBlue, cYellow, cPurple))).deckClass).isEqualTo(DeckAnalysis.DeckClass.TRIBUNAL_TEMPLE)
+
+        assertThat(DeckAnalysis(Deck(cards = listOf(cBlue, cYellow, cGreen))).deckClass).isEqualTo(DeckAnalysis.DeckClass.ALDEMERI_DOMINION)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cPurple, cRed, cBlue))).deckClass).isEqualTo(DeckAnalysis.DeckClass.DAGGERFALL_COVENANT)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cGreen, cPurple, cRed))).deckClass).isEqualTo(DeckAnalysis.DeckClass.EBONHEART_PACT)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cYellow, cGreen, cPurple))).deckClass).isEqualTo(DeckAnalysis.DeckClass.EMPIRE_OF_CYRODIIL)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cRed, cBlue, cYellow))).deckClass).isEqualTo(DeckAnalysis.DeckClass.GUILDSWORN)
+
+        // different order, with neutral
+        assertThat(DeckAnalysis(Deck(cards = listOf(cRed, cGreen, cGray))).deckClass).isEqualTo(DeckAnalysis.DeckClass.ARCHER)
+        assertThat(DeckAnalysis(Deck(cards = listOf(cBlue, cRed, cGray, cYellow))).deckClass).isEqualTo(DeckAnalysis.DeckClass.GUILDSWORN)
+
+    }
+
+    @Test
+    fun `class ability from colour`() {
+        assertThat(ClassAbility.fromColour(ClassColour.GREEN)).isEqualTo(ClassAbility.AGILITY)
+        assertThat(ClassAbility.fromColour(ClassColour.RED)).isEqualTo(ClassAbility.STRENGTH)
+        assertThat(ClassAbility.fromColour(ClassColour.BLUE)).isEqualTo(ClassAbility.INTELLIGENCE)
+        assertThat(ClassAbility.fromColour(ClassColour.YELLOW)).isEqualTo(ClassAbility.WILLPOWER)
+        assertThat(ClassAbility.fromColour(ClassColour.PURPLE)).isEqualTo(ClassAbility.ENDURANCE)
     }
 }
