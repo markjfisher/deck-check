@@ -215,9 +215,11 @@ object DeckImage {
         }
 
         // Deck class name
-        ig2.font = Font(fontName, Font.PLAIN, 28)
-        ig2.paint = Color(0xd2, 0xcb, 0xfe)
-        ig2.drawString("(${da.deckClassName})", attIndex * 108 - 8, topBlockHeight - 26)
+        if (da.totalCards > 0) {
+            ig2.font = Font(fontName, Font.PLAIN, 28)
+            ig2.paint = Color(0xd2, 0xcb, 0xfe)
+            ig2.drawString("(${da.deckClassName})", attIndex * 108 - 8, topBlockHeight - 26)
+        }
 
         val baos = ByteArrayOutputStream()
         ImageIO.write(bi, "PNG", baos)

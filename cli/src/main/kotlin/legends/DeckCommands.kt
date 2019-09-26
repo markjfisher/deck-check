@@ -54,7 +54,7 @@ enum class DeckCommands(val cmd: String) {
             val deck = DeckFixes.fix(Deck.importCode(deckCode))
 
             val imageData = DeckImage.from(deck, mention, username)
-            val fileName = "${username.substring(0, min(username.length, 10))}-${deckCode.substring(2,12)}.png"
+            val fileName = "${username.substring(0, min(username.length, 10))}-${deckCode.substring(2,min(deckCode.length - 2, 12))}.png"
                 .filter { it.isLetterOrDigit() || it == '.' || it == '-' }
 
             val fileData = imageData.toFileData(fileName)
