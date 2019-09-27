@@ -72,11 +72,14 @@ class DeckImageTest {
 //        val deck = Deck.importCode("SPAGmxhdumwAaAqcAKnMkgswkVnLbOcIdynrdhAIdIsUwfoewdrCxcjH")
 
         // Abell random deck
-        val deck = Deck.importCode("SPAJqhnLnNrRlwdKoOvKjXAHakrQoMrCbQeZfUAJdIoecIcwwIaKjHnrcy")
+//        val deck = Deck.importCode("SPAJqhnLnNrRlwdKoOvKjXAHakrQoMrCbQeZfUAJdIoecIcwwIaKjHnrcy")
 
 
 //        val deck = Deck.importCode("SPAJqhnLnNrRlwdKoOvKjXAHakrQoMrCbQeZfUAJdIoecIcwwIaKjHnrcy")
-        DeckImage.from(deck, "foo", "AbellWild")
+
+        // MML singleton
+        val deck = Deck.importCode("SPCXaJbqwbigutkPnFrPohlacdtDvUlxlkuCqovZgOkCdcwOeibnqpferfrtjWfyhLejuxqnereAkAaAjtuGqtdVkudtijmmaMbNpaiyiFlifBnbkrcUcOaPpewDtqpRkZkboMgDxcfmgTkojXbDlwehmdAAAA")
+        DeckImage.from(deck, "foo", "fenrock")
 
     }
 

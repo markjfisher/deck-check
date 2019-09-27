@@ -4,19 +4,16 @@ import io.elderscrollslegends.Card
 import io.elderscrollslegends.Deck
 import legends.DeckAnalysis.ClassAbility
 import legends.gfx.*
-import legends.gfx.Point
 import java.awt.*
+import java.awt.geom.AffineTransform
+import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
-import java.awt.image.FilteredImageSource
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.net.URL
 import javax.imageio.ImageIO
-import javax.swing.GrayFilter
 import kotlin.math.min
-import java.awt.image.AffineTransformOp
-import java.awt.geom.AffineTransform
-import java.io.ByteArrayOutputStream
 
 object DeckImage {
     private const val fontName = "FreeSans"
@@ -25,10 +22,10 @@ object DeckImage {
         val circRadius = 25
         val nameWidth = 250
         val leftMargin = 10
-        val rightMargin = 30
-        val topBlockHeight = 180
-        val heightGap = 3
-        val bottomMargin = 20
+        val leftSpace = 10
+        val topBlockHeight = 182
+        val heightGap = 5
+        val bottomMargin = 5
         val summaryTitleHeight = 50
 
         val da = DeckAnalysis(deck)
@@ -44,8 +41,8 @@ object DeckImage {
             orderedCards.drop(columnLengths[0] + columnLengths[1] + columnLengths[2]).take(columnLengths[3])
         )
 
-        val width = 4 * (leftMargin + circRadius*4 + nameWidth)
-        val height = topBlockHeight + columnLengths[0] * (2 * circRadius + heightGap) + bottomMargin + 5
+        val width = 4 * (leftMargin + circRadius*4 + nameWidth) - leftMargin + circRadius - leftSpace // for right side circle
+        val height = topBlockHeight + columnLengths[0] * (2 * circRadius + heightGap) + bottomMargin
 
         val bi = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
         val ig2 = bi.createGraphics()
@@ -62,9 +59,9 @@ object DeckImage {
                     RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON
                 )
-                val x1 = i * (leftMargin + 4*circRadius + nameWidth) + rightMargin
+                val x1 = i * (leftMargin + 4*circRadius + nameWidth) + circRadius + leftSpace
                 val x2 = x1 + nameWidth + circRadius*2
-                val y = topBlockHeight + 5 + circRadius + j * (circRadius*2 + 5)
+                val y = topBlockHeight + j * (circRadius*2 + heightGap) + circRadius
 
                 ////////////////////////////////////////////////////////////////////////////////////
                 // IMAGES
@@ -130,6 +127,12 @@ object DeckImage {
                 if (count > 1) {
                     ig2.color = Color.BLACK
                     ig2.fillCircle(Point(x2, y), (circRadius - 2).toDouble())
+                } else {
+                    if (card.unique) {
+                        val uniqueResource = this::class.java.classLoader.getResource("images/unique-28.png")
+                        val uniqueImage = ImageIO.read(uniqueResource)
+                        ig2.drawImage(uniqueImage, x2 - 13, y - 12, null)
+                    }
                 }
 
                 ////////////////////////////////////////////////////////////////////////////////////
@@ -223,6 +226,7 @@ object DeckImage {
 
         val baos = ByteArrayOutputStream()
         ImageIO.write(bi, "PNG", baos)
+        // ImageIO.write(bi, "PNG", File("/tmp/out1.png"))
 
         return baos.toByteArray()
     }
