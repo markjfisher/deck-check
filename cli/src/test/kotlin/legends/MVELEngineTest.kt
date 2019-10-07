@@ -1,9 +1,8 @@
 package legends
 
-import io.elderscrollslegends.Card
-import io.elderscrollslegends.Deck
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import tesl.model.Deck
 
 class MVELEngineTest {
     @Test
@@ -11,10 +10,10 @@ class MVELEngineTest {
         var failures: List<String>
         val tournament = Tournament(id = "t1")
 
-        val nord1 = Card(name = "nord card 1", subtypes = listOf("Nord"))
-        val nord2 = Card(name = "nord card 2", subtypes = listOf("Nord"))
-        val vamp = Card(name = "vampire card 1", subtypes = listOf("Vampire"))
-        val orc = Card(name = "Orc card 1", subtypes = listOf("Orc"))
+        val nord1 = Card(name = "nord card 1", subtypes = listOf("Nord")).createCard()
+        val nord2 = Card(name = "nord card 2", subtypes = listOf("Nord")).createCard()
+        val vamp = Card(name = "vampire card 1", subtypes = listOf("Vampire")).createCard()
+        val orc = Card(name = "Orc card 1", subtypes = listOf("Orc")).createCard()
 
         val deck1 = Deck(cards = listOf(nord1, nord2, vamp, orc))
 
@@ -99,18 +98,18 @@ class MVELEngineTest {
 
     @Test
     fun `by rarity tests`() {
-        val legendaryCreature = Card(name = "creature 1", subtypes = listOf("Nord"), type = "Creature", rarity = "Legendary")
-        val commonAction1 = Card(name = "common action 1", type = "Action", rarity = "Common")
-        val commonAction2 = Card(name = "common action 2", type = "Action", rarity = "Common")
-        val rareAction1 = Card(name = "rare action 1", type = "Action", rarity = "Rare")
-        val commonItem1 = Card(name = "common item 1", type = "Item", rarity = "Common")
-        val commonItem2 = Card(name = "common item 2", type = "Item", rarity = "Common")
-        val epicItem1 = Card(name = "epic item 1", type = "Item", rarity = "Epic")
-        val rareSupport1 = Card(name = "rare support 1", type = "Support", rarity = "Rare")
+        val legendaryCreature = Card(name = "creature 1", subtypes = listOf("Nord"), type = "Creature", rarity = "Legendary").createCard()
+        val commonAction1 = Card(name = "common action 1", type = "Action", rarity = "Common").createCard()
+        val commonAction2 = Card(name = "common action 2", type = "Action", rarity = "Common").createCard()
+        val rareAction1 = Card(name = "rare action 1", type = "Action", rarity = "Rare").createCard()
+        val commonItem1 = Card(name = "common item 1", type = "Item", rarity = "Common").createCard()
+        val commonItem2 = Card(name = "common item 2", type = "Item", rarity = "Common").createCard()
+        val epicItem1 = Card(name = "epic item 1", type = "Item", rarity = "Epic").createCard()
+        val rareSupport1 = Card(name = "rare support 1", type = "Support", rarity = "Rare").createCard()
 
         val deck = Deck(cards = listOf(legendaryCreature, commonAction1, commonAction1, commonAction2, rareAction1, commonItem1, commonItem2, commonItem2, epicItem1, rareSupport1, rareSupport1))
 
-        var failures: List<String>
+        val failures: List<String>
         val tournament = Tournament(id = "t1")
 
         tournament.rules.add("a.creaturesByRarity('Common').size() == 0")
@@ -150,14 +149,14 @@ class MVELEngineTest {
 
     @Test
     fun `is undead checks`() {
-        val creature1 = Card(name = "Tenarr Zalviit Lurker", subtypes = listOf("Khajiit", "Vampire"), type = "Creature")
-        val creature2 = Card(name = "Death Hound", subtypes = listOf("Beast", "Vampire"), type = "Creature")
+        val creature1 = Card(name = "Tenarr Zalviit Lurker", subtypes = listOf("Khajiit", "Vampire"), type = "Creature").createCard()
+        val creature2 = Card(name = "Death Hound", subtypes = listOf("Beast", "Vampire"), type = "Creature").createCard()
         val creature3 = Card(
             name = "Reflective Automaton",
             subtypes = listOf("Animal", "Argonian", "Ash Creature", "Beast", "Breton", "Centaur", "Chaurus", "Daedra", "Dark Elf", "Defense", "Dragon", "Dreugh", "Dwemer", "Elytra", "Fabricant", "Factotum", "Falmer", "Fish", "Gargoyle", "Giant", "Goblin", "God", "Grummite", "Harpy", "High Elf", "Imp", "Imperfect", "Imperial", "Insect", "Khajiit", "Kwama", "Lurcher", "Mammoth", "Mantikora", "Minotaur", "Mudcrab", "Mummy", "Nereid", "Netch", "Nord", "Ogre", "Orc", "Pastry", "Reachman", "Redguard", "Reptile", "Skeever", "Skeleton", "Spider", "Spirit", "Spriggan", "Troll", "Vampire", "Wamasu", "Werewolf", "Wolf", "Wood Elf", "Wraith"), type = "Creature"
-        )
-        val creature4 = Card(name = "Skeletal Dragon", subtypes = listOf("Dragon", "Skeleton"), type = "Creature")
-        val creature5 = Card(name = "A vampire", subtypes = listOf("Vampire"), type = "Creature")
+        ).createCard()
+        val creature4 = Card(name = "Skeletal Dragon", subtypes = listOf("Dragon", "Skeleton"), type = "Creature").createCard()
+        val creature5 = Card(name = "A vampire", subtypes = listOf("Vampire"), type = "Creature").createCard()
         val deck1 = Deck(cards = listOf(creature1, creature2, creature3, creature4, creature5))
 
         var failures: List<String>
@@ -168,7 +167,7 @@ class MVELEngineTest {
         failures = MVELEngine.checkRules(tournament, deck1)
         assertThat(failures).isEmpty()
 
-        val creature6 = Card(name = "A Khajiit", subtypes = listOf("Khajiit"), type = "Creature")
+        val creature6 = Card(name = "A Khajiit", subtypes = listOf("Khajiit"), type = "Creature").createCard()
         val deck2 = Deck(cards = listOf(creature1, creature2, creature3, creature4, creature5, creature6))
 
         failures = MVELEngine.checkRules(tournament, deck2)
@@ -182,7 +181,7 @@ class MVELEngineTest {
 
         tournament.rules.add("a.isUndead()")
 
-        val creature = Card(name = "A Khajiit", subtypes = listOf("Khajiit"), type = "Creature")
+        val creature = Card(name = "A Khajiit", subtypes = listOf("Khajiit"), type = "Creature").createCard()
         val deck2 = Deck(cards = listOf(creature))
 
         failures = MVELEngine.checkRules(tournament, deck2)
@@ -199,7 +198,7 @@ class MVELEngineTest {
         tournament.reasons.add("You must have exactly 1 rare card, you had @{rareCount}")
         tournament.reasons.add("You must have exactly 1 epic card, you had @{epicCount}")
 
-        val creature = Card(name = "A Khajiit", subtypes = listOf("Khajiit"), type = "Creature", rarity = "Common")
+        val creature = Card(name = "A Khajiit", subtypes = listOf("Khajiit"), type = "Creature", rarity = "Common").createCard()
         val deck2 = Deck(cards = listOf(creature))
 
         failures = MVELEngine.checkRules(tournament, deck2)

@@ -24,6 +24,6 @@ allprojects {
     }
 
     group = "net.markjfisher"
-    version = "1.1.14"
+    version = "1.2.0"
 
 }

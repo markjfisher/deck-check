@@ -7,6 +7,7 @@ plugins {
 }
 
 val elderscrollsLegendsSdkJavaVersion: String by project
+val teslJavaSdkVersion: String by project
 val cliktVersion: String by project
 val kotlinVersion: String by project
 
@@ -26,7 +27,7 @@ val deckCheckBotToken: String by project
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
-    implementation("net.markjfisher:elderscrolls-legends-sdk-java:$elderscrollsLegendsSdkJavaVersion")
+    implementation("net.markjfisher:tesl-java-sdk:$teslJavaSdkVersion")
     implementation("com.github.ajalt:clikt:$cliktVersion")
 
     implementation("ch.qos.logback:logback-classic:$logbackClassicVersion")

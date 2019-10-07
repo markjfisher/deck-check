@@ -1,9 +1,6 @@
 package legends
 
 import com.jessecorbett.diskord.api.rest.CreateMessage
-import com.jessecorbett.diskord.api.rest.Embed
-import com.jessecorbett.diskord.api.rest.EmbedAuthor
-import com.jessecorbett.diskord.api.rest.EmbedImage
 import com.jessecorbett.diskord.dsl.bot
 import com.jessecorbett.diskord.dsl.command
 import com.jessecorbett.diskord.dsl.commands
@@ -11,18 +8,9 @@ import com.jessecorbett.diskord.util.mention
 import com.jessecorbett.diskord.util.sendFile
 import com.jessecorbett.diskord.util.words
 import com.natpryce.konfig.*
-import io.elderscrollslegends.CardCache
-import io.elderscrollslegends.Deck
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.UnstableDefault
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.list
 import mu.KotlinLogging
-import org.jeasy.rules.api.Facts
-import org.jeasy.rules.api.Rules
-import org.jeasy.rules.core.DefaultRulesEngine
-import org.jeasy.rules.mvel.MVELRule
 
 private val logger = KotlinLogging.logger {}
 
@@ -43,15 +31,26 @@ object BotCheck {
     fun main(args: Array<String>) {
         admins.addAll(config[adminsKey].split(","))
 
+        while(true) {
+            try {
+                runBot()
+            } catch (e: Exception) {
+                logger.error(e) { "Caught exception running bot. Restarting..." }
+            }
+        }
+
+    }
+
+    private fun runBot() {
         runBlocking {
-            logger.info {"Loading card cache..."}
-            CardCache.load()
-            logger.info {"... complete loading."}
             bot(config[token]) {
                 commands(prefix = "!") {
                     command(command = "deck") {
                         val deckArgs = words.drop(1)
-                        val deckCommand = DeckCommands.values().find { it.cmd == deckArgs[0] } ?: DeckCommands.CMD_HELP
+                        val deckCommand = when {
+                            deckArgs.isEmpty() -> DeckCommands.CMD_HELP
+                            else -> DeckCommands.values().find { it.cmd == deckArgs[0] } ?: DeckCommands.CMD_HELP
+                        }
                         val replyData = deckCommand.run(deckArgs.drop(1), author.mention, author.username)
 
                         if (replyData.fileData != null) {
@@ -70,7 +69,9 @@ object BotCheck {
 
                     command(command = "tournament") {
                         val tournamentArgs = words.drop(1)
-                        val tournamentCommand = TournamentCommands.values().find { it.cmd == tournamentArgs[0] } ?: TournamentCommands.CMD_HELP
+                        val tournamentCommand =
+                            TournamentCommands.values().find { it.cmd == tournamentArgs[0] }
+                                ?: TournamentCommands.CMD_HELP
                         val replyData = tournamentCommand.run(tournamentArgs.drop(1), author.mention, author.username)
 
                         replyData.text.forEach { text ->
@@ -90,6 +91,4 @@ object BotCheck {
             }
         }
     }
-
 }
-

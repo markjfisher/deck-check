@@ -1,31 +1,14 @@
 package legends
 
-import io.elderscrollslegends.Card
-import io.elderscrollslegends.CardCache
-import io.elderscrollslegends.Deck
-import org.assertj.core.api.Assertions
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import tesl.model.Card
+import tesl.model.CardCache
 
 class RealAPITests {
 
     @Test
-    @Disabled("Runs against live API")
-    fun `missing cards test`() {
-        CardCache.load()
-        val deck = Deck.importCode("SPABvMAAAA")
-        val da = DeckAnalysis(deck)
-
-        Assertions.assertThat(da.creatureCount).isEqualTo(1)
-    }
-
-    @Test
-    @Disabled("Runs against live API")
     fun `sorting cards for abell`() {
-        println("Reading cards....")
-        val cards = Card.all()
-        println("... done")
-
+        val cards = CardCache.all()
         val greenCards = cards.filter { it.attributes.size == 1 && it.attributes.first() == "Agility" }
         val yellowCards = cards.filter { it.attributes.size == 1 && it.attributes.first() == "Willpower" }
         val redCards = cards.filter { it.attributes.size == 1 && it.attributes.first() == "Strength" }
@@ -109,12 +92,8 @@ class RealAPITests {
     }
 
     @Test
-    @Disabled("Runs against live API")
     fun `Find creatures without a subtype`() {
-        println("Reading cards....")
-        val cards = Card.all()
-        println("... done")
-
+        val cards = CardCache.all()
         val nonSubtypedCards = cards.filter { it.type == "Creature" }
             .filter { it.subtypes.isEmpty() }
 

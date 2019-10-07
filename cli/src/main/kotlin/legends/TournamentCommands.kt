@@ -1,6 +1,6 @@
 package legends
 
-import io.elderscrollslegends.Deck
+import tesl.model.Deck
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import legends.MVELEngine.checkRules
@@ -280,7 +280,7 @@ enum class TournamentCommands(val cmd: String) {
 
         logger.info { "Register: user: $username, ign: $ign, tournament: $tid, deck-code: $deckCode" }
 
-        val deck = DeckFixes.fix(Deck.importCode(deckCode))
+        val deck = Deck.importCode(deckCode)
 
         val failedRules = checkRules(tournament, deck)
         if (failedRules.isEmpty()) {
@@ -332,7 +332,7 @@ enum class TournamentCommands(val cmd: String) {
             ?: return "$mention Error: Cannot check deck code. Tournament with id $tid does not exist (pick from $tournamentIdList)"
 
         val deckCode = args[1]
-        val deck = DeckFixes.fix(Deck.importCode(deckCode))
+        val deck = Deck.importCode(deckCode)
 
         logger.info { "Check: user: $username, tournament: $tid, deck-code: $deckCode" }
 

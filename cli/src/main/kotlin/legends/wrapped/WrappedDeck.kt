@@ -1,7 +1,7 @@
 package legends.wrapped
 
-import io.elderscrollslegends.Card
-import io.elderscrollslegends.Deck
+import tesl.model.Card
+import tesl.model.Deck
 
 class WrappedDeck(private val deck: Deck) {
     fun hasCard(name: String): Boolean {

@@ -1,11 +1,9 @@
 package legends
 
-import io.elderscrollslegends.Card
-import io.elderscrollslegends.Deck
-
 import legends.DeckAnalysis.ClassColour.*
+import tesl.model.Card
+import tesl.model.Deck
 import java.awt.Color
-import java.lang.Exception
 
 class DeckAnalysis(private val deck: Deck) {
     companion object {
@@ -155,16 +153,14 @@ class DeckAnalysis(private val deck: Deck) {
         }).toMap()
 
         setToCards = deck.cards
-            .groupBy { it.set.id }
+            .filter { it.set["id"] != null }
+            .groupBy { it.set["id"] }
             .map { (set, cards) ->
-                (set to cards.toHashSet().toList().sortedBy { it.name })
+                (set!! to cards.toHashSet().toList().sortedBy { it.name })
             }
             .toMap()
 
-        soulGemCost = deck.cards.map {
-            if (it.soulSummon.isEmpty()) 0
-            else { try { it.soulSummon.toInt() } catch (_: Exception) { 0 } }
-        }.sum()
+        soulGemCost = deck.cards.sumBy { it.soulSummon }
 
         // Sorts all the cards by cost, then name, and then groups the same card into a count to give List<CardCount>
         // so that each card is represented only once in the list, but its count is still captured in the ordering
@@ -256,7 +252,6 @@ class DeckAnalysis(private val deck: Deck) {
 
     }
 
-
     enum class ClassColour(val hexColor: Color) {
         GREEN(Color(0x00, 0x80, 0x00, colourAlpha)),
         RED(Color(0x80, 0x00, 0x00, colourAlpha)),
@@ -313,6 +308,5 @@ class DeckAnalysis(private val deck: Deck) {
         EMPIRE_OF_CYRODIIL(listOf(YELLOW, GREEN, PURPLE)),
         GUILDSWORN(listOf(RED, BLUE, YELLOW))
     }
-
 
 }

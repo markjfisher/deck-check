@@ -1,7 +1,7 @@
 package legends
 
-import io.elderscrollslegends.Card
-import io.elderscrollslegends.Deck
+import tesl.model.Card
+import tesl.model.Deck
 
 class DeckCheck {
     companion object {

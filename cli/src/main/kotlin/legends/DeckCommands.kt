@@ -1,11 +1,11 @@
 package legends
 
 import com.jessecorbett.diskord.util.toFileData
-import io.elderscrollslegends.Card
-import io.elderscrollslegends.Deck
-import io.elderscrollslegends.Decoder
-import io.elderscrollslegends.DecoderType
 import mu.KotlinLogging
+import tesl.model.Card
+import tesl.model.Deck
+import tesl.model.Decoder
+import tesl.model.DecoderType
 import java.lang.Integer.min
 
 private val logger = KotlinLogging.logger {}
@@ -51,7 +51,7 @@ enum class DeckCommands(val cmd: String) {
 
             val deckCode = args[0]
             logger.info { "User: $username asked for image for code: $deckCode" }
-            val deck = DeckFixes.fix(Deck.importCode(deckCode))
+            val deck = Deck.importCode(deckCode)
 
             val imageData = DeckImage.from(deck, mention, username)
             val fileName = "${username.substring(0, min(username.length, 10))}-${deckCode.substring(2,min(deckCode.length - 2, 12))}.png"
@@ -92,7 +92,7 @@ enum class DeckCommands(val cmd: String) {
 
         val deckCode = args[0]
         logger.info { "User: $username asked for $type for code: $deckCode" }
-        val deck = DeckFixes.fix(Deck.importCode(deckCode))
+        val deck = Deck.importCode(deckCode)
         val da = DeckAnalysis(deck)
 
         val reply = when (type) {
@@ -175,7 +175,7 @@ enum class DeckCommands(val cmd: String) {
         }
 
         val maxSetIdLength = deck.cards.fold(0) { max, c ->
-            val len = c.set.id.length
+            val len = c.set["id"]?.length ?: 0
             if (len > max) len else max
         }
 
@@ -206,7 +206,7 @@ enum class DeckCommands(val cmd: String) {
 
                 val namesString = String.format("%-${maxCardNameLength}s", card.name.take(maxCardNameLength))
                 val rarityString = String.format("%-6s", card.rarity.take(6))
-                val setName = String.format("| %-${maxSetIdLength}s", card.set.id)
+                val setName = String.format("| %-${maxSetIdLength}s", card.set["id"])
                 val typesString = if (card.subtypes.isNotEmpty()) String.format("| %-${maxTypesLength}s", card.subtypes.joinToString(",")) else ""
                 "$size x $namesString $costPowerHealthString $rarityString $setName $typesString"
 

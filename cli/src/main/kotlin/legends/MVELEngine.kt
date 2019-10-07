@@ -1,6 +1,6 @@
 package legends
 
-import io.elderscrollslegends.Deck
+import tesl.model.Deck
 import legends.wrapped.WrappedDeck
 import legends.wrapped.WrappedList
 import org.jeasy.rules.api.Facts
