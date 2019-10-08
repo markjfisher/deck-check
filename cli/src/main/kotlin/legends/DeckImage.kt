@@ -228,7 +228,7 @@ object DeckImage {
 
         val baos = ByteArrayOutputStream()
         ImageIO.write(bi, "PNG", baos)
-        ImageIO.write(bi, "PNG", File("/tmp/deck-image/out1.png"))
+        // ImageIO.write(bi, "PNG", File("/tmp/deck-image/out1.png"))
 
         return baos.toByteArray()
     }
