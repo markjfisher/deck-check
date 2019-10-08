@@ -17,21 +17,22 @@ import kotlin.math.min
 
 object DeckImage {
     private const val fontName = "FreeSans"
+    private const val numCols = 5
+    private const val circRadius = 25
+    private const val nameWidth = 250
+    private const val leftMargin = 10
+    private const val leftSpace = 10
+    private const val topBlockHeight = 188
+    private const val heightGap = 5
+    private const val bottomMargin = 5
+    private const val summaryTitleHeight = 50
+    private const val width = 4 * (leftMargin + circRadius*4 + nameWidth) - leftMargin + circRadius - leftSpace
 
     fun from(deck: Deck, mention: String, username: String): ByteArray {
         val colourLineLight = Color(0x50, 0x4e, 0x36)
         val colourLineDark = Color(0x39, 0x37, 0x25)
         val leftCircleFilledResource = this::class.java.classLoader.getResource("images/outer-blue-50.png")
         val rightCircleHollowResource = this::class.java.classLoader.getResource("images/outer-50.png")
-
-        val circRadius = 25
-        val nameWidth = 250
-        val leftMargin = 10
-        val leftSpace = 10
-        val topBlockHeight = 182
-        val heightGap = 5
-        val bottomMargin = 5
-        val summaryTitleHeight = 50
 
         val da = DeckAnalysis(deck)
         val numCards = da.totalUnique
@@ -46,7 +47,6 @@ object DeckImage {
             orderedCards.drop(columnLengths[0] + columnLengths[1] + columnLengths[2]).take(columnLengths[3])
         )
 
-        val width = 4 * (leftMargin + circRadius*4 + nameWidth) - leftMargin + circRadius - leftSpace // for right side circle
         val height = topBlockHeight + columnLengths[0] * (2 * circRadius + heightGap) + bottomMargin
 
         val bi = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
@@ -180,22 +180,22 @@ object DeckImage {
             }
         }
 
-        displayUser(ig2, username)
+        val usernameHeight = displayUser(ig2, username)
 
         // Summary details
-        displayDeckDetailValue(ig2, "Creatures:", "${da.creatureCount}", 2, 0, 5, width, summaryTitleHeight)
-        displayDeckDetailValue(ig2, "Soulgems:", "${da.soulGemCost}", 2, 1, 5, width, summaryTitleHeight)
-        displayDeckDetailValue(ig2, "Count:", "${da.totalCards}", 2, 2, 5, width, summaryTitleHeight)
+        displayDeckDetailValue(ig2, "Creatures:", "${da.creatureCount}", 0, 0)
+        displayDeckDetailValue(ig2, "Soulgems:", "${da.soulGemCost}", 0, 1)
+        displayDeckDetailValue(ig2, "Count:", "${da.totalCards}", 0, 2)
 
-        displayDeckDetailValue(ig2, "Actions:", "${da.actionsCount}", 3, 0, 5, width, summaryTitleHeight)
-        displayDeckDetailValue(ig2, "Items:", "${da.itemsCount}", 3, 1, 5, width, summaryTitleHeight)
-        displayDeckDetailValue(ig2, "Supports:", "${da.supportsCount}", 3, 2, 5, width, summaryTitleHeight)
-        displayDeckDetailValue(ig2, "Prophecies:", "${da.prophecyCount}", 3, 3, 5, width, summaryTitleHeight)
+        displayDeckDetailValue(ig2, "Actions:", "${da.actionsCount}", 1, 0)
+        displayDeckDetailValue(ig2, "Items:", "${da.itemsCount}", 1, 1)
+        displayDeckDetailValue(ig2, "Supports:", "${da.supportsCount}", 1, 2)
+        displayDeckDetailValue(ig2, "Prophecies:", "${da.prophecyCount}", 1, 3)
 
-        displayDeckDetailValue(ig2, "Commons:", "${da.commonCount}", 4, 0, 5, width, summaryTitleHeight)
-        displayDeckDetailValue(ig2, "Rares:", "${da.rareCount}", 4, 1, 5, width, summaryTitleHeight)
-        displayDeckDetailValue(ig2, "Epics:", "${da.epicCount}", 4, 2, 5, width, summaryTitleHeight)
-        displayDeckDetailValue(ig2, "Legendaries:", "${da.legendaryCount}", 4, 3, 5, width, summaryTitleHeight)
+        displayDeckDetailValue(ig2, "Commons:", "${da.commonCount}", 2, 0)
+        displayDeckDetailValue(ig2, "Rares:", "${da.rareCount}", 2, 1)
+        displayDeckDetailValue(ig2, "Epics:", "${da.epicCount}", 2, 2)
+        displayDeckDetailValue(ig2, "Legendaries:", "${da.legendaryCount}", 2, 3)
 
         // DECK CLASS
         // First get the abilities into the correct order as per the class colour order
@@ -262,7 +262,7 @@ object DeckImage {
         return bufferedImage
     }
 
-    private fun displayUser(g: Graphics2D, name: String) {
+    private fun displayUser(g: Graphics2D, name: String): Int {
         val nameLen = name.length
         val fontSize = when {
             nameLen < 10 -> 85
@@ -278,10 +278,12 @@ object DeckImage {
         val hName = fm.ascent
         g.paint = Color(0xc6, 0xc6, 0xc6)
         g.drawString(name, 10, 5 + hName)
+        return hName
     }
 
-    private fun displayDeckDetailValue(g: Graphics2D, title: String, text: String, x: Int, y: Int, numCols: Int, width: Int, titleMargin: Int) {
+    private fun displayDeckDetailValue(g: Graphics2D, title: String, text: String, x: Int, y: Int) {
         val fontSize = 30
+        val xAdj = x + 2
 
         // Title
         g.font = Font(fontName, Font.PLAIN, fontSize)
@@ -289,7 +291,7 @@ object DeckImage {
         val wTitle = fmTitle.stringWidth(title)
         val hTitle = fmTitle.ascent
         g.paint = Color(0x86, 0x86, 0x86)
-        g.drawString(title, x*width/numCols + (width/numCols)*7/10 - wTitle - 10, hTitle + y * (fontSize + 15) + titleMargin - 45)
+        g.drawString(title, xAdj*width/numCols + (width/numCols)*7/10 - wTitle - 10, hTitle + y * (fontSize + 15) + summaryTitleHeight - 45)
 
         // Text
         g.font = Font(fontName, Font.BOLD, fontSize)
@@ -297,7 +299,7 @@ object DeckImage {
         val wText = fmText.stringWidth(text)
         val hText = fmText.ascent
         g.paint = Color(0xd2, 0xcb, 0xfe)
-        g.drawString(text, x*width/numCols + (width/numCols)*7/10 + 10, hText + y * (fontSize + 15) + titleMargin - 45)
+        g.drawString(text, xAdj*width/numCols + (width/numCols)*7/10 + 10, hText + y * (fontSize + 15) + summaryTitleHeight - 45)
 
     }
 

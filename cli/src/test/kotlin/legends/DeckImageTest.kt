@@ -74,10 +74,12 @@ class DeckImageTest {
 //        val deck = Deck.importCode("SPAJqhnLnNrRlwdKoOvKjXAHakrQoMrCbQeZfUAJdIoecIcwwIaKjHnrcy")
 
 
-        val deck = Deck.importCode("SPAJqhnLnNrRlwdKoOvKjXAHakrQoMrCbQeZfUAJdIoecIcwwIaKjHnrcy")
+//        val deck = Deck.importCode("SPAJqhnLnNrRlwdKoOvKjXAHakrQoMrCbQeZfUAJdIoecIcwwIaKjHnrcy")
 
         // MML singleton
 //        val deck = Deck.importCode("SPCXaJbqwbigutkPnFrPohlacdtDvUlxlkuCqovZgOkCdcwOeibnqpferfrtjWfyhLejuxqnereAkAaAjtuGqtdVkudtijmmaMbNpaiyiFlifBnbkrcUcOaPpewDtqpRkZkboMgDxcfmgTkojXbDlwehmdAAAA")
+
+        val deck = Deck.importCode("SPABxxAAAA")
         DeckImage.from(deck, "foo", "fenrock")
 
     }
