@@ -9,6 +9,7 @@ import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.IOException
 import java.net.URL
 import javax.imageio.ImageIO
@@ -18,6 +19,11 @@ object DeckImage {
     private const val fontName = "FreeSans"
 
     fun from(deck: Deck, mention: String, username: String): ByteArray {
+        val colourLineLight = Color(0x50, 0x4e, 0x36)
+        val colourLineDark = Color(0x39, 0x37, 0x25)
+        val leftCircleFilledResource = this::class.java.classLoader.getResource("images/outer-blue-50.png")
+        val rightCircleHollowResource = this::class.java.classLoader.getResource("images/outer-50.png")
+
         val circRadius = 25
         val nameWidth = 250
         val leftMargin = 10
@@ -104,34 +110,31 @@ object DeckImage {
                 ////////////////////////////////////////////////////////////////////////////////////
                 // CONNECTING PARALLEL LINES (will be overwritten by circles)
                 ////////////////////////////////////////////////////////////////////////////////////
-                ig2.color = Color.BLUE
+                ig2.color = colourLineDark
                 ig2.drawLine(Point(x1, y - circRadius + 2), Point(x2, y - circRadius + 2))
                 ig2.drawLine(Point(x1, y + circRadius - 2), Point(x2, y + circRadius - 2))
+                ig2.color = colourLineLight
+                ig2.drawLine(Point(x1, y - circRadius + 1), Point(x2, y - circRadius + 1))
+                ig2.drawLine(Point(x1, y + circRadius - 1), Point(x2, y + circRadius - 1))
 
                 ////////////////////////////////////////////////////////////////////////////////////
                 // LEFT OUTER CIRCLE
-                ig2.fillCircle(Point(x1, y), circRadius.toDouble())
+                val leftCircle = ImageIO.read(leftCircleFilledResource)
+                ig2.drawImage(leftCircle, x1 - circRadius, y - circRadius, null)
+
                 // RIGHT OUTER (OR LINE)
                 if (count > 1) {
-                    ig2.fillCircle(Point(x2, y), circRadius.toDouble())
+                    val rightCircle = ImageIO.read(rightCircleHollowResource)
+                    ig2.drawImage(rightCircle, x2 - circRadius, y - circRadius, null)
                 } else {
                     ig2.drawLine(Point(x2, y - circRadius + 2), Point(x2, y + circRadius - 2))
                 }
 
-                ////////////////////////////////////////////////////////////////////////////////////
-                // LEFT INNER
-                ig2.color = Color.CYAN
-                ig2.fillCircle(Point(x1, y), (circRadius - 2).toDouble())
                 // RIGHT INNER
-                if (count > 1) {
-                    ig2.color = Color.BLACK
-                    ig2.fillCircle(Point(x2, y), (circRadius - 2).toDouble())
-                } else {
-                    if (card.unique) {
-                        val uniqueResource = this::class.java.classLoader.getResource("images/unique-28.png")
-                        val uniqueImage = ImageIO.read(uniqueResource)
-                        ig2.drawImage(uniqueImage, x2 - 13, y - 12, null)
-                    }
+                if (card.unique) {
+                    val uniqueResource = this::class.java.classLoader.getResource("images/unique-28.png")
+                    val uniqueImage = ImageIO.read(uniqueResource)
+                    ig2.drawImage(uniqueImage, x2 - 13, y - 12, null)
                 }
 
                 ////////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +211,7 @@ object DeckImage {
         attributeCount.forEach { (attribute, count) ->
             val iconResource = this::class.java.classLoader.getResource("images/${attribute}-50.png")
             val iconImage = ImageIO.read(iconResource)
-            val x = 5 + attIndex++ * 108
+            val x = 10 + attIndex++ * 108
             val y = topBlockHeight - 60
             ig2.drawImage(iconImage, x, y, null)
 
@@ -220,12 +223,12 @@ object DeckImage {
         if (da.totalCards > 0) {
             ig2.font = Font(fontName, Font.PLAIN, 28)
             ig2.paint = Color(0xd2, 0xcb, 0xfe)
-            ig2.drawString("(${da.deckClassName})", attIndex * 108 - 8, topBlockHeight - 26)
+            ig2.drawString("(${da.deckClassName})", attIndex * 108 - 2, topBlockHeight - 26)
         }
 
         val baos = ByteArrayOutputStream()
         ImageIO.write(bi, "PNG", baos)
-        // ImageIO.write(bi, "PNG", File("/tmp/out1.png"))
+        ImageIO.write(bi, "PNG", File("/tmp/deck-image/out1.png"))
 
         return baos.toByteArray()
     }
@@ -274,7 +277,7 @@ object DeckImage {
         val fm = g.fontMetrics
         val hName = fm.ascent
         g.paint = Color(0xc6, 0xc6, 0xc6)
-        g.drawString(name, 5, 5 + hName)
+        g.drawString(name, 10, 5 + hName)
     }
 
     private fun displayDeckDetailValue(g: Graphics2D, title: String, text: String, x: Int, y: Int, numCols: Int, width: Int, titleMargin: Int) {

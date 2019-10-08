@@ -279,11 +279,11 @@ class DeckAnalysis(private val deck: Deck) {
     enum class DeckClass(val classColours: List<ClassColour>) {
         NEUTRAL(emptyList()),
 
-        SINGLE_GREEN(listOf(GREEN)),
-        SINGLE_RED(listOf(RED)),
-        SINGLE_BLUE(listOf(BLUE)),
-        SINGLE_YELLOW(listOf(YELLOW)),
-        SINGLE_PURPLE(listOf(PURPLE)),
+        AGILITY(listOf(GREEN)),
+        STRENGTH(listOf(RED)),
+        INTELLIGENCE(listOf(BLUE)),
+        WILLPOWER(listOf(YELLOW)),
+        ENDURANCE(listOf(PURPLE)),
 
         ARCHER(listOf(GREEN, RED)),
         ASSASSIN(listOf(GREEN, BLUE)),
