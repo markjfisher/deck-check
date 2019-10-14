@@ -1,8 +1,11 @@
 package legends.gfx
 
 import java.awt.Graphics
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
 import java.lang.Math.PI
 import java.util.*
+import javax.imageio.ImageIO
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -105,3 +108,9 @@ val Double.i : Int
     get() = toInt()
 
 fun Double.toDeg() = (this * 180.0 / PI).i
+
+fun BufferedImage.toByteArray(): ByteArray {
+    val baos = ByteArrayOutputStream()
+    ImageIO.write(this, "PNG", baos)
+    return baos.toByteArray()
+}

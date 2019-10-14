@@ -1,6 +1,7 @@
 package legends
 
 import com.jessecorbett.diskord.util.toFileData
+import legends.gfx.toByteArray
 import mu.KotlinLogging
 import tesl.model.Card
 import tesl.model.Deck
@@ -53,13 +54,13 @@ enum class DeckCommands(val cmd: String) {
             logger.info { "User: $username asked for image for code: $deckCode" }
             val deck = Deck.importCode(deckCode)
 
-            val imageData = DeckImage.from(deck, mention, username)
             val fileName = "${username.substring(0, min(username.length, 10))}-${deckCode.substring(2,min(deckCode.length - 2, 12))}.png"
                 .filter { it.isLetterOrDigit() || it == '.' || it == '-' }
 
-            val fileData = imageData.toFileData(fileName)
-
-            return ReplyData(text = listOf("$mention - here is your deck for $deckCode"), fileData = fileData)
+            return ReplyData(
+                text = listOf("$mention - here is your deck for $deckCode"),
+                fileData = DeckImage.from(deck, mention, username).toByteArray().toFileData(fileName)
+            )
         }
     },
 

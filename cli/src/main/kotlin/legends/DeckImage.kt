@@ -27,24 +27,25 @@ object DeckImage {
     private const val bottomMargin = 5
     private const val summaryTitleHeight = 50
     private const val width = 4 * (leftMargin + circRadius*4 + nameWidth) - leftMargin + circRadius - leftSpace
+    private const val scaleX: Double = 0.5
+    private const val scaleY: Double = 0.5
 
-    fun from(deck: Deck, mention: String, username: String): ByteArray {
-        val colourLineLight = Color(0x50, 0x4e, 0x36)
-        val colourLineDark = Color(0x39, 0x37, 0x25)
-        val leftCircleFilledResource = this::class.java.classLoader.getResource("images/outer-blue-50.png")
-        val rightCircleHollowResource = this::class.java.classLoader.getResource("images/outer-50.png")
+    private val colourLineLight = Color(0x50, 0x4e, 0x36)
+    private val colourLineDark = Color(0x39, 0x37, 0x25)
+    private val leftCircleFilledResource = this::class.java.classLoader.getResource("images/outer-blue-50.png")
+    private val rightCircleHollowResource = this::class.java.classLoader.getResource("images/outer-50.png")
+    private val at = AffineTransform.getScaleInstance(scaleX, scaleY)
+    private val scaleOp = AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR)
 
+    fun from(deck: Deck, mention: String, username: String): BufferedImage {
         val da = DeckAnalysis(deck)
-        val numCards = da.totalUnique
-        val columnLengths: List<Int> = calculateColumnLengths(numCards, 4)
-
-        val orderedCards = da.cardCountSorted
+        val columnLengths: List<Int> = calculateColumnLengths(da.totalUnique, 4)
 
         val cardsInColumns = listOf(
-            orderedCards.take(columnLengths[0]),
-            orderedCards.drop(columnLengths[0]).take(columnLengths[1]),
-            orderedCards.drop(columnLengths[0] + columnLengths[1]).take(columnLengths[2]),
-            orderedCards.drop(columnLengths[0] + columnLengths[1] + columnLengths[2]).take(columnLengths[3])
+            da.cardCountSorted.take(columnLengths[0]),
+            da.cardCountSorted.drop(columnLengths[0]).take(columnLengths[1]),
+            da.cardCountSorted.drop(columnLengths[0] + columnLengths[1]).take(columnLengths[2]),
+            da.cardCountSorted.drop(columnLengths[0] + columnLengths[1] + columnLengths[2]).take(columnLengths[3])
         )
 
         val height = topBlockHeight + columnLengths[0] * (2 * circRadius + heightGap) + bottomMargin
@@ -73,7 +74,7 @@ object DeckImage {
                 ////////////////////////////////////////////////////////////////////////////////////
                 val imageData = getImageData(card)
                 val cutdownImage = copySubImage(imageData, 60, 140, imageData.width - 130, 110)
-                val scaledImage = scaleImage(cutdownImage, 0.5, 0.5)
+                val scaledImage = scaleImage(cutdownImage)
 
                 // CLOUD on left, CARD on right, dissolve between the two
 
@@ -89,8 +90,8 @@ object DeckImage {
                     image2 = scaledImage,
                     width = boxWidth,
                     height = boxHeight,
-                    mergePoint = 0.60f,
-                    mergePercent = 0.15f
+                    mergePoint = 0.59f,
+                    mergePercent = 0.13f
                 )
 
                 ////////////////////////////////////////////////////////////////////////////////////
@@ -102,27 +103,23 @@ object DeckImage {
                 val colourBoxWidth = boxWidth * 14 / 20
                 val colourOverlay: BufferedImage = when(cc.size) {
                     1 -> GfxFade.createColourFade(
-                        c1 = cc[0].hexColor,
-                        c2 = cc[0].hexColor,
+                        colours = listOf(cc[0].hexColor, cc[0].hexColor),
                         width = colourBoxWidth,
                         height = boxHeight
                     )
                     2 -> GfxFade.createColourFade(
-                        c1 = cc[0].hexColor,
-                        c2 = cc[1].hexColor,
-                        width = colourBoxWidth * 3 / 4,
+                        colours = listOf(cc[0].hexColor, cc[1].hexColor),
+                        width = colourBoxWidth * 9 / 13,
                         height = boxHeight,
                         mergePercent = 0.25f,
-                        additionalWidth =  colourBoxWidth * 1 / 4
+                        additionalWidth =  colourBoxWidth * 4 / 13
                     )
                     else -> GfxFade.createColourFade(
-                        c1 = cc[0].hexColor,
-                        c2 = cc[1].hexColor,
-                        c3 = cc[2].hexColor,
-                        width = colourBoxWidth * 7 / 12,
+                        colours = listOf(cc[0].hexColor, cc[1].hexColor, cc[2].hexColor),
+                        width = colourBoxWidth * 9 / 13,
                         height = boxHeight,
                         mergePercent = 0.2f,
-                        additionalWidth = colourBoxWidth * 5 / 12
+                        additionalWidth = colourBoxWidth * 4 / 13
                     )
                 }
 
@@ -261,11 +258,7 @@ object DeckImage {
             ig2.drawString("(${da.deckClassName})", attIndex * 108 - 2, topBlockHeight - 26)
         }
 
-        val baos = ByteArrayOutputStream()
-        ImageIO.write(bi, "PNG", baos)
-        ImageIO.write(bi, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/out1.png"))
-
-        return baos.toByteArray()
+        return bi
     }
 
     private fun copySubImage(image: BufferedImage, x: Int, y: Int, w: Int, h: Int): BufferedImage {
@@ -276,14 +269,9 @@ object DeckImage {
         return new
     }
 
-    private fun scaleImage(image: BufferedImage, scaleX: Double, scaleY: Double): BufferedImage {
+    private fun scaleImage(image: BufferedImage): BufferedImage {
         val after = BufferedImage((image.width * scaleX).toInt(), (image.height * scaleY).toInt(), BufferedImage.TYPE_INT_ARGB)
-        val at = AffineTransform.getScaleInstance(scaleX, scaleY)
-        val scaleOp = AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR)
-        val scaledImage = scaleOp.filter(image, after)
-        println("original image width: ${image.width}, height: ${image.height}")
-        println("  scaled image width: ${scaledImage.width}, height: ${scaledImage.height}")
-        return scaledImage
+        return scaleOp.filter(image, after)
     }
 
     private fun Image.toBufferedImage(): BufferedImage {

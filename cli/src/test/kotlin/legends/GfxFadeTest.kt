@@ -22,7 +22,12 @@ class GfxFadeTest {
 
         val width = 320
         val height = 80
-        val bufferedImage: BufferedImage = GfxFade.createColourFade(c1, c2, c3, width, height, 0.1f)
+        val bufferedImage: BufferedImage = GfxFade.createColourFade(
+            colours = listOf(c1, c2, c3),
+            width = width,
+            height = height,
+            mergePercent = 0.1f
+        )
 
         val frame = MainFrame(bufferedImage)
         frame.isVisible = true

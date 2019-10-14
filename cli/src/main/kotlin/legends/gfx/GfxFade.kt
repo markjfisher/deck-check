@@ -35,7 +35,7 @@ object GfxFade {
         val gradient2 = LinearGradientPaint(
             Point(xa, ya),
             Point(xb, yb),
-            floatArrayOf(0.0f, mergePoint - mergePercent/2.0f, mergePoint + mergePercent/2.0f, 1.0f),
+            floatArrayOf(0.0f, mergePoint - mergePercent / 2.0f, mergePoint + mergePercent / 2.0f, 1.0f),
             colors2
         )
 
@@ -53,24 +53,6 @@ object GfxFade {
         return combine(bi1, bi2)
     }
 
-    fun createColourFade(c1: Color, c2: Color, width: Int, height: Int, mergePercent: Float = 0.2f, additionalWidth: Int = 0): BufferedImage {
-        val colors = listOf(c1, c1, c2, c2).toTypedArray()
-
-        val gradientPaint = LinearGradientPaint(
-            Point(width/3, 0),
-            Point(width*2/3, height),
-            floatArrayOf(
-                0.0f,
-                0.5f - mergePercent/2.0f,
-                0.5f + mergePercent/2.0f,
-                1.0f
-            ),
-            colors
-        )
-
-        return addExtraWidth(width = width, height = height, paint = gradientPaint, additionalWidth = additionalWidth)
-    }
-
     private fun combine(image1: BufferedImage, image2: BufferedImage): BufferedImage {
         val width = max(image1.width, image2.width)
         val height = max(image1.height, image2.height)
@@ -84,7 +66,14 @@ object GfxFade {
         return newImage
     }
 
-    private fun paint(width: Int, height: Int, paint: Paint? = null, composite: Composite? = null, x: Int = 0, y: Int = 0): BufferedImage {
+    private fun paint(
+        width: Int,
+        height: Int,
+        paint: Paint? = null,
+        composite: Composite? = null,
+        x: Int = 0,
+        y: Int = 0
+    ): BufferedImage {
         val newImage = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
         val g = newImage.createGraphics()
         if (paint != null) g.paint = paint
@@ -94,24 +83,42 @@ object GfxFade {
         return newImage
     }
 
-    fun createColourFade(c1: Color, c2: Color, c3: Color, width: Int, height: Int, mergePercent: Float = 0.1f, additionalWidth: Int = 0): BufferedImage {
-        val colors = listOf(c1, c1, c2, c2, c3, c3).toTypedArray()
-
+    fun createColourFade(
+        colours: List<Color>,
+        width: Int,
+        height: Int,
+        mergePercent: Float = 0.1f,
+        additionalWidth: Int = 0
+    ): BufferedImage {
+        val createTransitionFloats = createTransitionFloats(colours.size, mergePercent)
+        val createColourBoundaryArray = createColourBoundaryArray(colours)
         val gradientPaint = LinearGradientPaint(
-            Point(width*3/24, 0),
-            Point(width*21/24, height),
-            floatArrayOf(
-                0.0f,
-                0.333f - mergePercent/2.0f,
-                0.333f + mergePercent/4.0f,
-                0.666f - mergePercent/4.0f,
-                0.666f + mergePercent/2.0f,
-                1.0f
-            ),
-            colors
+            Point(width * 3 / 24, 0),
+            Point(width * 21 / 24, height),
+            createTransitionFloats,
+            createColourBoundaryArray
         )
-
         return addExtraWidth(width = width, height = height, paint = gradientPaint, additionalWidth = additionalWidth)
+    }
+
+    private fun createColourBoundaryArray(colours: List<Color>) = colours
+        .fold(mutableListOf<Color>()) { list, colour ->
+            list.add(colour)
+            list.add(colour)
+            list
+        }.toTypedArray()
+
+    private fun createTransitionFloats(n: Int, mergePercent: Float): FloatArray {
+        // we have (n-1)*2 middle points to add, and top and tail with 0/1
+        val floats = mutableListOf<Float>()
+        floats.add(0.0f)
+        (0 until n-1).forEach { i ->
+            val f = (i + 1).toFloat() / n.toFloat()
+            floats.add(f - mergePercent / 2.0f)
+            floats.add(f + mergePercent / 4.0f)
+        }
+        floats.add(1.0f)
+        return floats.toFloatArray()
     }
 
     private fun addExtraWidth(width: Int, height: Int, paint: Paint, additionalWidth: Int): BufferedImage {
@@ -126,7 +133,7 @@ object GfxFade {
             Color(0, 0, 0, 0x00)
         ).toTypedArray()
 
-        val f = width.toFloat()/fullWidth.toFloat() - 0.00001f
+        val f = width.toFloat() / fullWidth.toFloat() - 0.00001f
         val gradient = LinearGradientPaint(
             Point(0, height / 2),
             Point(fullWidth, height / 2),
