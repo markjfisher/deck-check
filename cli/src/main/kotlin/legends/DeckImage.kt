@@ -23,7 +23,7 @@ object DeckImage {
     private const val leftMargin = 10
     private const val leftSpace = 10
     private const val topBlockHeight = 188
-    private const val heightGap = 5
+    private const val heightGap = 7
     private const val bottomMargin = 5
     private const val summaryTitleHeight = 50
     private const val width = 4 * (leftMargin + circRadius*4 + nameWidth) - leftMargin + circRadius - leftSpace
@@ -72,7 +72,7 @@ object DeckImage {
                 // IMAGES
                 ////////////////////////////////////////////////////////////////////////////////////
                 val imageData = getImageData(card)
-                val cutdownImage = copySubImage(imageData, 70, 140, imageData.width - 150, 110)
+                val cutdownImage = copySubImage(imageData, 60, 140, imageData.width - 130, 110)
                 val scaledImage = scaleImage(cutdownImage, 0.5, 0.5)
 
                 // CLOUD on left, CARD on right, dissolve between the two
@@ -82,27 +82,62 @@ object DeckImage {
                 val cloudImage = ImageIO.read(cloudResource)
 
                 // Merge
-                val mergedImage = GfxFade.mergeImages(cloudImage, scaledImage, x2-x1, circRadius*2 - 4, 0.65f)
+                val boxHeight = circRadius * 2 - 4
+                val boxWidth = x2 - x1
+                val mergedImage = GfxFade.combine(
+                    image1 = cloudImage,
+                    image2 = scaledImage,
+                    width = boxWidth,
+                    height = boxHeight,
+                    mergePoint = 0.60f,
+                    mergePercent = 0.15f
+                )
 
                 ////////////////////////////////////////////////////////////////////////////////////
                 // FILLED BOX WITH CARD COLOURS
                 // The alpha channel of the colours determine the opacity of the colour
                 val cc = card.attributes
                     .map { ClassAbility.valueOf(it.toUpperCase()).classColour }
-                    .sortedBy { it.name }
 
-                val colourBoxWidth = (x2 - x1) * 14 / 20
-                val colourBoxHeight = circRadius * 2 - 4
+                val colourBoxWidth = boxWidth * 14 / 20
                 val colourOverlay: BufferedImage = when(cc.size) {
-                    1 -> GfxFade.createColourFade(cc[0].hexColor, cc[0].hexColor, colourBoxWidth, colourBoxHeight)
-                    2 -> GfxFade.createColourFade(cc[0].hexColor, cc[1].hexColor, colourBoxWidth, colourBoxHeight,0.1f)
-                    else -> GfxFade.createColourFade(cc[0].hexColor, cc[1].hexColor, cc[2].hexColor, colourBoxWidth, colourBoxHeight, 0.1f)
+                    1 -> GfxFade.createColourFade(
+                        c1 = cc[0].hexColor,
+                        c2 = cc[0].hexColor,
+                        width = colourBoxWidth,
+                        height = boxHeight
+                    )
+                    2 -> GfxFade.createColourFade(
+                        c1 = cc[0].hexColor,
+                        c2 = cc[1].hexColor,
+                        width = colourBoxWidth * 3 / 4,
+                        height = boxHeight,
+                        mergePercent = 0.25f,
+                        additionalWidth =  colourBoxWidth * 1 / 4
+                    )
+                    else -> GfxFade.createColourFade(
+                        c1 = cc[0].hexColor,
+                        c2 = cc[1].hexColor,
+                        c3 = cc[2].hexColor,
+                        width = colourBoxWidth * 7 / 12,
+                        height = boxHeight,
+                        mergePercent = 0.2f,
+                        additionalWidth = colourBoxWidth * 5 / 12
+                    )
                 }
 
                 // now combine colourImage and mergedImage
-                val finalImage = GfxFade.mergeImages(colourOverlay, mergedImage, x2-x1, circRadius*2 - 4, 0.55f, mergePercent = 0.15f)
+                val finalImage = GfxFade.combine(
+                    image1 = colourOverlay,
+                    image2 = mergedImage,
+                    width = boxWidth,
+                    height = boxHeight,
+                    mergePoint = 0.45f,
+                    mergePercent = 0.08f,
+                    initialAlpha = 0x3f
+                )
 
-                ig2.clipRect(x1, y-circRadius+2, x2-x1, circRadius*2 - 4)
+                ig2.clipRect(x1, y-circRadius+2, boxWidth, circRadius*2 - 4)
                 ig2.drawImage(finalImage, x1, y-circRadius+2, null)
 
                 ig2.clip = null
@@ -118,14 +153,14 @@ object DeckImage {
                 ig2.drawLine(Point(x1, y + circRadius - 1), Point(x2, y + circRadius - 1))
 
                 ////////////////////////////////////////////////////////////////////////////////////
-                // LEFT OUTER CIRCLE
+                // LEFT CIRCLE
                 val leftCircle = ImageIO.read(leftCircleFilledResource)
-                ig2.drawImage(leftCircle, x1 - circRadius, y - circRadius, null)
+                ig2.drawImage(leftCircle, x1 - circRadius, y - circRadius + 1, null)
 
                 // RIGHT OUTER (OR LINE)
                 if (count > 1) {
                     val rightCircle = ImageIO.read(rightCircleHollowResource)
-                    ig2.drawImage(rightCircle, x2 - circRadius, y - circRadius, null)
+                    ig2.drawImage(rightCircle, x2 - circRadius, y - circRadius + 1, null)
                 } else {
                     ig2.drawLine(Point(x2, y - circRadius + 2), Point(x2, y + circRadius - 2))
                 }
@@ -150,7 +185,7 @@ object DeckImage {
                     RenderingHints.KEY_TEXT_ANTIALIASING,
                     RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                 )
-                ig2.drawString(costMessage, if (costMessage.length == 1) x1 - 7 else x1 - wCost / 2 - 2, y + hCost / 2 - 2)
+                ig2.drawString(costMessage, if (costMessage.length == 1) x1 - 7 else x1 - wCost / 2 - 2, y + hCost / 2 - 1)
 
                 ////////////////////////////////////////////////////////////////////////////////////
                 // RIGHT NUMBER = COUNT (if > 1)
@@ -161,7 +196,7 @@ object DeckImage {
                     val wCount = fmCount.stringWidth(countMessage)
                     val hCount = fmCount.ascent
                     ig2.paint = Color.WHITE
-                    ig2.drawString(countMessage, x2 + wCount / 2 - 14, y + hCount / 2 - 2)
+                    ig2.drawString(countMessage, x2 + wCount / 2 - 14, y + hCount / 2 - 1)
                 }
 
                 ////////////////////////////////////////////////////////////////////////////////////
@@ -228,13 +263,12 @@ object DeckImage {
 
         val baos = ByteArrayOutputStream()
         ImageIO.write(bi, "PNG", baos)
-        // ImageIO.write(bi, "PNG", File("/tmp/deck-image/out1.png"))
+        ImageIO.write(bi, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/out1.png"))
 
         return baos.toByteArray()
     }
 
     private fun copySubImage(image: BufferedImage, x: Int, y: Int, w: Int, h: Int): BufferedImage {
-        // imageData.getSubimage(20, 130, imageData.width - 100, 110)
         val new = BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
         val g = new.createGraphics()
         g.drawImage(image.getSubimage(x, y, w, h), 0, 0, null)
@@ -246,7 +280,10 @@ object DeckImage {
         val after = BufferedImage((image.width * scaleX).toInt(), (image.height * scaleY).toInt(), BufferedImage.TYPE_INT_ARGB)
         val at = AffineTransform.getScaleInstance(scaleX, scaleY)
         val scaleOp = AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR)
-        return scaleOp.filter(image, after)
+        val scaledImage = scaleOp.filter(image, after)
+        println("original image width: ${image.width}, height: ${image.height}")
+        println("  scaled image width: ${scaledImage.width}, height: ${scaledImage.height}")
+        return scaledImage
     }
 
     private fun Image.toBufferedImage(): BufferedImage {

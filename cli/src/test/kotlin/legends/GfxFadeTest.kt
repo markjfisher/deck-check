@@ -36,7 +36,7 @@ class GfxFadeTest {
         val i1 = ImageIO.read(this::class.java.getResource("/test-image1.png"))
         val i2 = ImageIO.read(this::class.java.getResource("/test-image2.png"))
 
-        val merged = GfxFade.mergeImages(i1, i2, 500, 100, 0.5f, 0.2f)
+        val merged = GfxFade.combine(i1, i2, 500, 100, 0.5f, 0.2f)
 
         val frame = MainFrame(merged)
         frame.isVisible = true
@@ -50,7 +50,7 @@ class GfxFadeTest {
         val i1 = ImageIO.read(this::class.java.getResource("/test-image1.png"))
         val i2 = ImageIO.read(this::class.java.getResource("/test-image2.png")).getSubimage(250, 0, 250, 100)
 
-        val merged = GfxFade.mergeImages(i1, i2, 500, 100, 0.75f, 0.2f)
+        val merged = GfxFade.combine(i1, i2, 500, 100, 0.75f, 0.2f)
 
         val frame = MainFrame(merged)
         frame.isVisible = true

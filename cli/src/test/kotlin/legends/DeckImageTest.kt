@@ -65,7 +65,7 @@ class DeckImageTest {
 //        val deck = Deck.importCode("SPAGiPoPrkwbeigpAGfWvGeQwydEgBATmRjkwUmGbDcxmopexbdLhnqzfBfPkvvVlYlIqT")
 
         // triple card:
-//        val deck = Deck.importCode("SPAMsIrggOqolHhFnNajuxqktDeiADmooEcOATuznAbDcxgstmqyhnnwqNfBfPkveDlYqBlImlqT")
+        val deck = Deck.importCode("SPAMsIrggOqolHhFnNajuxqktDeiADmooEcOATuznAbDcxgstmqyhnnwqNfBfPkveDlYqBlImlqT")
 
         // multi-card
 //        val deck = Deck.importCode("SPAGmxhdumwAaAqcAKnMkgswkVnLbOcIdynrdhAIdIsUwfoewdrCxcjH")
@@ -79,7 +79,7 @@ class DeckImageTest {
         // MML singleton
 //        val deck = Deck.importCode("SPCXaJbqwbigutkPnFrPohlacdtDvUlxlkuCqovZgOkCdcwOeibnqpferfrtjWfyhLejuxqnereAkAaAjtuGqtdVkudtijmmaMbNpaiyiFlifBnbkrcUcOaPpewDtqpRkZkboMgDxcfmgTkojXbDlwehmdAAAA")
 
-        val deck = Deck.importCode("SPABxxAAAA")
+//        val deck = Deck.importCode("SPABxxAAAA")
         DeckImage.from(deck, "foo", "fenrock")
 
     }

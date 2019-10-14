@@ -11,6 +11,7 @@ dist
 .project
 .settings/
 .classpath
+/sandbox
 
 .attach_pid*
 .DS_Store

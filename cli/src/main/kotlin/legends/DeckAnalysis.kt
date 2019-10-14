@@ -7,7 +7,7 @@ import java.awt.Color
 
 class DeckAnalysis(private val deck: Deck) {
     companion object {
-        const val colourAlpha = 0x4f
+        const val colourAlpha = 0xff
     }
 
     val byRarity: Map<String, List<Card>>
