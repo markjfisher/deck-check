@@ -1,6 +1,8 @@
 package legends
 
+import com.jessecorbett.diskord.api.model.User
 import com.jessecorbett.diskord.api.rest.CreateMessage
+import com.jessecorbett.diskord.api.rest.client.ChannelClient
 import com.jessecorbett.diskord.dsl.bot
 import com.jessecorbett.diskord.dsl.command
 import com.jessecorbett.diskord.dsl.commands
@@ -31,12 +33,11 @@ object BotCheck {
     fun main(args: Array<String>) {
         admins.addAll(config[adminsKey].split(","))
 
-        while(true) {
-            try {
-                runBot()
-            } catch (e: Exception) {
-                logger.error(e) { "Caught exception running bot. Restarting..." }
-            }
+        // a while loop here doesn't help. eats all resources on machine, as bot doesn't release gracefully.
+        try {
+            runBot()
+        } catch (e: Exception) {
+            logger.error(e) { "Bot died." }
         }
 
     }
@@ -46,42 +47,11 @@ object BotCheck {
             bot(config[token]) {
                 commands(prefix = "!") {
                     command(command = "deck") {
-                        val deckArgs = words.drop(1)
-                        val deckCommand = when {
-                            deckArgs.isEmpty() -> DeckCommands.CMD_HELP
-                            else -> DeckCommands.values().find { it.cmd == deckArgs[0] } ?: DeckCommands.CMD_HELP
-                        }
-                        val replyData = deckCommand.run(deckArgs.drop(1), author.mention, author.username)
-
-                        if (replyData.fileData != null) {
-                            channel.sendFile(data = replyData.fileData, comment = replyData.text.first())
-                        } else {
-                            replyData.text.forEach { text ->
-                                channel.createMessage(
-                                    CreateMessage(
-                                        content = text,
-                                        embed = replyData.embed
-                                    )
-                                )
-                            }
-                        }
+                        reply(channel, doDeckCommand(words, author))
                     }
 
                     command(command = "tournament") {
-                        val tournamentArgs = words.drop(1)
-                        val tournamentCommand =
-                            TournamentCommands.values().find { it.cmd == tournamentArgs[0] }
-                                ?: TournamentCommands.CMD_HELP
-                        val replyData = tournamentCommand.run(tournamentArgs.drop(1), author.mention, author.username)
-
-                        replyData.text.forEach { text ->
-                            channel.createMessage(
-                                CreateMessage(
-                                    content = text,
-                                    embed = replyData.embed
-                                )
-                            )
-                        }
+                        reply(channel, doTournamentCommand(words, author))
                     }
                 }
 
@@ -90,5 +60,45 @@ object BotCheck {
                 }
             }
         }
+    }
+
+    private suspend fun reply(channel: ChannelClient, replyData: ReplyData) {
+        if (replyData.fileData != null) {
+            channel.sendFile(data = replyData.fileData, comment = replyData.text.first())
+        } else {
+            replyData.text.forEach { text ->
+                channel.createMessage(
+                    CreateMessage(
+                        content = text,
+                        embed = replyData.embed
+                    )
+                )
+            }
+        }
+
+    }
+
+    private fun doTournamentCommand(words: List<String>, author: User): ReplyData {
+        val tournamentArgs = words.drop(1)
+        val tournamentCommand = when {
+            tournamentArgs.isEmpty() -> TournamentCommands.CMD_HELP
+            else -> TournamentCommands
+                .values()
+                .find { it.cmd == tournamentArgs[0] }
+                ?: TournamentCommands.CMD_HELP
+        }
+        return tournamentCommand.run(tournamentArgs.drop(1), author.mention, author.username)
+    }
+
+    private fun doDeckCommand(w: List<String>, author: User): ReplyData {
+        val deckArgs = w.drop(1)
+        val deckCommand = when {
+            deckArgs.isEmpty() -> DeckCommands.CMD_HELP
+            else -> DeckCommands
+                .values()
+                .find { it.cmd == deckArgs[0] }
+                ?: DeckCommands.CMD_HELP
+        }
+        return deckCommand.run(deckArgs.drop(1), author.mention, author.username)
     }
 }
