@@ -50,37 +50,24 @@ class DeckImageTest {
         val c24 = Card(id = "24", name = "x named card here", cost = 7).createCard()
         val c25 = Card(id = "25", name = "y named card here", cost = 12).createCard()
         val deck = Deck(cards = listOf(c1, c1, c2, c2, c3, c4, c5, c5, c5, c6, c7, c8, c9, c10, c10, c11, c12, c12, c13, c13, c14, c15, c16, c17, c17, c18, c18, c19, c20, c21, c22, c22, c23, c24, c25))
-        DeckImage.from(deck, "foo", "fenrock")
+        DeckImage.from(deck, "fenrock")
     }
 
     @Test
     @Disabled
     fun `real deck image loading`() {
-        println("loading cards...")
-        CardCache.load()
-        println("... finished")
-        // SPAMsIrggOqolHhFnNajuxqktDeiADmooEcOATuznAbDcxgstmqyhnnwqNfBfPkveDlYqBlImlqT
-//        val deck = Deck.importCode("SPAGnRsjeklabzrzAEkXgJjnrPAMgUkYjSmToZpqdMfrkpfqxehO")
-//        val deck = Deck.importCode("SPAKustKdVugmPhYgDeMsMhMAKujePklniarrHnHaHmgulAPdWgPdBoVnjjNgQdlprcltEjHgvdUvQ")
-//        val deck = Deck.importCode("SPAGiPoPrkwbeigpAGfWvGeQwydEgBATmRjkwUmGbDcxmopexbdLhnqzfBfPkvvVlYlIqT")
-
         // triple card:
-        val deck = Deck.importCode("SPAMsIrggOqolHhFnNajuxqktDeiADmooEcOATuznAbDcxgstmqyhnnwqNfBfPkveDlYqBlImlqT")
+        val tripleCardDeck = Deck.importCode("SPAMsIrggOqolHhFnNajuxqktDeiADmooEcOATuznAbDcxgstmqyhnnwqNfBfPkveDlYqBlImlqT")
 
         // multi-card
-//        val deck = Deck.importCode("SPAGmxhdumwAaAqcAKnMkgswkVnLbOcIdynrdhAIdIsUwfoewdrCxcjH")
-
-        // Abell random deck
-//        val deck = Deck.importCode("SPAJqhnLnNrRlwdKoOvKjXAHakrQoMrCbQeZfUAJdIoecIcwwIaKjHnrcy")
-
-
-//        val deck = Deck.importCode("SPAJqhnLnNrRlwdKoOvKjXAHakrQoMrCbQeZfUAJdIoecIcwwIaKjHnrcy")
+        val multiCardDeck = Deck.importCode("SPAGmxhdumwAaAqcAKnMkgswkVnLbOcIdynrdhAIdIsUwfoewdrCxcjH")
 
         // MML singleton
-//        val deck = Deck.importCode("SPCXaJbqwbigutkPnFrPohlacdtDvUlxlkuCqovZgOkCdcwOeibnqpferfrtjWfyhLejuxqnereAkAaAjtuGqtdVkudtijmmaMbNpaiyiFlifBnbkrcUcOaPpewDtqpRkZkboMgDxcfmgTkojXbDlwehmdAAAA")
+        val singletonDeck = Deck.importCode("SPCXaJbqwbigutkPnFrPohlacdtDvUlxlkuCqovZgOkCdcwOeibnqpferfrtjWfyhLejuxqnereAkAaAjtuGqtdVkudtijmmaMbNpaiyiFlifBnbkrcUcOaPpewDtqpRkZkboMgDxcfmgTkojXbDlwehmdAAAA")
 
-//        val deck = Deck.importCode("SPABxxAAAA")
-        DeckImage.from(deck, "foo", "fenrock")
+        // DO IT
+        val image = DeckImage.from(tripleCardDeck, "fenrock")
+        ImageIO.write(image, "PNG", File("./sandbox/out.png"))
 
     }
 
@@ -88,17 +75,18 @@ class DeckImageTest {
     @Disabled("One off for getting the images into project")
     fun `download images to resource dir`() {
         val cards = CardCache.all()
-        println("writing images...")
         cards.forEach { card ->
-            println("saving ${card.name}")
-            val path = File("/home/markf/dev/personal/gaming/deck-check/cli/src/test/resources/images/cards/${sanitize(card.name)}.png")
+            val path = File("/home/markf/dev/personal/gaming/deck-check/cli/src/main/resources/images/cards/${sanitize(card.name)}.png")
             if (!path.exists()) {
                 val image = ImageIO.read(URL(card.imageUrl))
                 if (image != null) {
+                    println("\nsaving ${card.name}")
                     ImageIO.write(image, "PNG", path)
                 } else {
                     println ("ERROR: No image for card: $card")
                 }
+            } else {
+                print(".")
             }
         }
         println("... done")

@@ -8,8 +8,6 @@ import java.awt.*
 import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
-import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.IOException
 import java.net.URL
 import javax.imageio.ImageIO
@@ -37,7 +35,7 @@ object DeckImage {
     private val at = AffineTransform.getScaleInstance(scaleX, scaleY)
     private val scaleOp = AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR)
 
-    fun from(deck: Deck, mention: String, username: String): BufferedImage {
+    fun from(deck: Deck, username: String): BufferedImage {
         val da = DeckAnalysis(deck)
         val columnLengths: List<Int> = calculateColumnLengths(da.totalUnique, 4)
 

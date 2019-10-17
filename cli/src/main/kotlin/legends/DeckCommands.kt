@@ -59,7 +59,7 @@ enum class DeckCommands(val cmd: String) {
 
             return ReplyData(
                 text = listOf("$mention - here is your deck for $deckCode"),
-                fileData = DeckImage.from(deck, mention, username).toByteArray().toFileData(fileName)
+                fileData = DeckImage.from(deck, username).toByteArray().toFileData(fileName)
             )
         }
     },
