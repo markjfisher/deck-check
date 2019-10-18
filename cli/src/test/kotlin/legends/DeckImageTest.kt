@@ -56,24 +56,38 @@ class DeckImageTest {
     @Test
     @Disabled
     fun `real deck image loading`() {
-        // triple card:
-        val tripleCardDeck = Deck.importCode("SPAMsIrggOqolHhFnNajuxqktDeiADmooEcOATuznAbDcxgstmqyhnnwqNfBfPkveDlYqBlImlqT")
+        var image = DeckImage.from(Deck.importCode("SPCXaJbqwbigutkPnFrPohlacdtDvUlxlkuCqovZgOkCdcwOeibnqpferfrtjWfyhLejuxqnereAkAaAjtuGqtdVkudtijmmaMbNpaiyiFlifBnbkrcUcOaPpewDtqpRkZkboMgDxcfmgTkojXbDlwehmdAAAA"), "MML Singleton")
+        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/mml_singleton.png"))
 
-        // multi-card
-        val multiCardDeck = Deck.importCode("SPAGmxhdumwAaAqcAKnMkgswkVnLbOcIdynrdhAIdIsUwfoewdrCxcjH")
+        image = DeckImage.from(Deck.importCode("SPAJxMhfdJgTixwucfdMujADfDkgumAUdIsUxznMswnLoewdpTrCcIvKsyfxlZimjHydnrdh"), "Dominion Lover")
+        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/aldmeri_dominion.png"))
 
-        // MML singleton
-        val singletonDeck = Deck.importCode("SPCXaJbqwbigutkPnFrPohlacdtDvUlxlkuCqovZgOkCdcwOeibnqpferfrtjWfyhLejuxqnereAkAaAjtuGqtdVkudtijmmaMbNpaiyiFlifBnbkrcUcOaPpewDtqpRkZkboMgDxcfmgTkojXbDlwehmdAAAA")
+        image = DeckImage.from(Deck.importCode("SPBHpRzBakrUdVeffVgOkZnboPxGxgmUnHxtyDodqoqtdddwgBigxLctjgrPuCbdsZeUpSAHjExioMjHoRxTehALxqgyxmybxlrCxpxrcrmcxN"), "Daggerfall Dude")
+        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/daggerfall_covenant.png"))
 
-        // DO IT
-        var image = DeckImage.from(multiCardDeck, "fenrock")
-        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/multi.png"))
+        image = DeckImage.from(Deck.importCode("SPAHrgtQbkxhtwddqcAEgkmypVdpAUmGnAbDgshyoEpeqaaNdynwaMbYmnqkoRqBlIrklx"), "Ebonheart4TW")
+        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/ebonheart_pact.png"))
 
-        image = DeckImage.from(tripleCardDeck, "fenrock")
-        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/triple.png"))
+        image = DeckImage.from(Deck.importCode("SPAEgToayoeFAKwUcxdfovwVwwwGuqyhbQARxzkknMtsgppTwcfxfDhUlZsmsQimyddhma"), "EmpireOrDie")
+        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/empire_of_cyrodiil.png"))
 
-        image = DeckImage.from(singletonDeck, "fenrock is a really long name yes")
-        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/singleton.png"))
+        image = DeckImage.from(Deck.importCode("SPAEgyhahFkrAKfWtmlZuFgjhSjHyhtlnEARmGcxdftioerCsHdLvKhnoocMimydmalYdE"), "Guildsworn Gal")
+        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/guildsworn.png"))
+
+        image = DeckImage.from(Deck.importCode("SPADwsguaTAGdqsHhlldoogjAUlDdldImGnMlLvBoeotpTrCvKmCnipZcMdBujbFdh"), "I'm a god!")
+        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/house_dagoth.png"))
+
+        image = DeckImage.from(Deck.importCode("SPANmGrgdSejekajczdXffwWmuyBasABumAUsAerlWbvceebguneaNdLechnuAiqaZhTknlYfAyn"), "Cat Lover")
+        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/house_hlaalu.png"))
+
+        image = DeckImage.from(Deck.importCode("SPACgOjgAFfWlqrBdLqTAVysjkakcxyFgplLmRovrQxbxEyiytfBwEeDyzlYlIml"), "Redoran Ranker")
+        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/house_redoran.png"))
+
+        image = DeckImage.from(Deck.importCode("SPAKdKmxrpnNqtgByxeBjtliAEhNnXeeuCATxqnAybgsxlxioeqyxpqfqNkvmcxNsSqBlIrbeh"), "Tevanni Trader")
+        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/house_telvanni.png"))
+
+        image = DeckImage.from(Deck.importCode("SPAPjVaJqnbqqouGigfeyHlkaAwboNtDkCAJfWovqhsHdVhFnNkArPAOcxoeoMrCvKuAsmdrfBfPydmalYvD"), "Tribunal Till I Die")
+        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/tribunal_temple.png"))
 
     }
 

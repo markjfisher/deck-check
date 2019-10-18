@@ -467,7 +467,7 @@ class DeckAnalysisTest {
                     )
                 )
             ).deckClass
-        ).isEqualTo(DeckClass.ALDEMERI_DOMINION)
+        ).isEqualTo(DeckClass.ALDMERI_DOMINION)
         assertThat(
             DeckAnalysis(
                 Deck(

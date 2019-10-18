@@ -155,7 +155,7 @@ object DeckImage {
                     height = boxHeight,
                     mergePoint = 0.45f,
                     mergePercent = 0.08f,
-                    initialAlpha = 0x3f
+                    initialAlpha = 0x7f
                 )
 
                 ig2.clipRect(x1, y-circRadius+2, boxWidth, circRadius*2 - 4)
@@ -382,12 +382,12 @@ object DeckImage {
     private fun displayUser(g: Graphics2D, name: String): Int {
         val nameLen = name.length
         val fontSize = when {
-            nameLen < 10 -> 85
-            nameLen < 15 -> 70
-            nameLen < 20 -> 56
-            nameLen < 25 -> 44
-            nameLen < 30 -> 36
-            nameLen < 40 -> 27
+            nameLen < 10 -> 75
+            nameLen < 15 -> 55
+            nameLen < 20 -> 45
+            nameLen < 25 -> 40
+            nameLen < 30 -> 30
+            nameLen < 40 -> 25
             else -> 18
         }
         g.font = Font(fontName, Font.PLAIN, fontSize)

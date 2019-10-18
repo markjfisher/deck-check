@@ -304,7 +304,7 @@ class DeckAnalysis(private val deck: Deck) {
         HOUSE_TELVANNI(listOf(BLUE, GREEN, PURPLE)),
         TRIBUNAL_TEMPLE(listOf(BLUE, YELLOW, PURPLE)),
 
-        ALDEMERI_DOMINION(listOf(BLUE, YELLOW, GREEN)),
+        ALDMERI_DOMINION(listOf(BLUE, YELLOW, GREEN)),
         DAGGERFALL_COVENANT(listOf(PURPLE, RED, BLUE)),
         EBONHEART_PACT(listOf(GREEN, PURPLE, RED)),
         EMPIRE_OF_CYRODIIL(listOf(YELLOW, GREEN, PURPLE)),
