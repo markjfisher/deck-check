@@ -1,9 +1,9 @@
 package legends
 
-import tesl.model.Deck
 import legends.DeckAnalysis.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import tesl.model.Deck
 
 class DeckAnalysisTest {
     @Test
@@ -36,7 +36,8 @@ class DeckAnalysisTest {
 
     @Test
     fun `creatures actions items supports are filtered correctly`() {
-        val legendaryCreature = Card(name = "creature 1", subtypes = listOf("Nord"), type = "Creature", rarity = "Legendary").createCard()
+        val legendaryCreature =
+            Card(name = "creature 1", subtypes = listOf("Nord"), type = "Creature", rarity = "Legendary").createCard()
         val commonAction1 = Card(name = "common action 1", type = "Action", rarity = "Common").createCard()
         val commonAction2 = Card(name = "common action 2", type = "Action", rarity = "Common").createCard()
         val rareAction1 = Card(name = "rare action 1", type = "Action", rarity = "Rare").createCard()
@@ -45,7 +46,21 @@ class DeckAnalysisTest {
         val epicItem1 = Card(name = "epic item 1", type = "Item", rarity = "Epic").createCard()
         val rareSupport1 = Card(name = "rare support 1", type = "Support", rarity = "Rare").createCard()
 
-        val deck = Deck(cards = listOf(legendaryCreature, commonAction1, commonAction1, commonAction2, rareAction1, commonItem1, commonItem2, commonItem2, epicItem1, rareSupport1, rareSupport1))
+        val deck = Deck(
+            cards = listOf(
+                legendaryCreature,
+                commonAction1,
+                commonAction1,
+                commonAction2,
+                rareAction1,
+                commonItem1,
+                commonItem2,
+                commonItem2,
+                epicItem1,
+                rareSupport1,
+                rareSupport1
+            )
+        )
         val da = DeckAnalysis(deck)
 
         assertThat(da.creatures).containsOnly(legendaryCreature)
@@ -95,13 +110,78 @@ class DeckAnalysisTest {
 
     @Test
     fun `is undead check`() {
-        val creature1 = Card(name = "Tenarr Zalviit Lurker", subtypes = listOf("Khajiit", "Vampire"), type = "Creature").createCard()
-        val creature2 = Card(name = "Death Hound", subtypes = listOf("Beast", "Vampire"), type = "Creature").createCard()
+        val creature1 = Card(
+            name = "Tenarr Zalviit Lurker",
+            subtypes = listOf("Khajiit", "Vampire"),
+            type = "Creature"
+        ).createCard()
+        val creature2 =
+            Card(name = "Death Hound", subtypes = listOf("Beast", "Vampire"), type = "Creature").createCard()
         val creature3 = Card(
             name = "Reflective Automaton",
-            subtypes = listOf("Animal", "Argonian", "Ash Creature", "Beast", "Breton", "Centaur", "Chaurus", "Daedra", "Dark Elf", "Defense", "Dragon", "Dreugh", "Dwemer", "Elytra", "Fabricant", "Factotum", "Falmer", "Fish", "Gargoyle", "Giant", "Goblin", "God", "Grummite", "Harpy", "High Elf", "Imp", "Imperfect", "Imperial", "Insect", "Khajiit", "Kwama", "Lurcher", "Mammoth", "Mantikora", "Minotaur", "Mudcrab", "Mummy", "Nereid", "Netch", "Nord", "Ogre", "Orc", "Pastry", "Reachman", "Redguard", "Reptile", "Skeever", "Skeleton", "Spider", "Spirit", "Spriggan", "Troll", "Vampire", "Wamasu", "Werewolf", "Wolf", "Wood Elf", "Wraith"), type = "Creature"
+            subtypes = listOf(
+                "Animal",
+                "Argonian",
+                "Ash Creature",
+                "Beast",
+                "Breton",
+                "Centaur",
+                "Chaurus",
+                "Daedra",
+                "Dark Elf",
+                "Defense",
+                "Dragon",
+                "Dreugh",
+                "Dwemer",
+                "Elytra",
+                "Fabricant",
+                "Factotum",
+                "Falmer",
+                "Fish",
+                "Gargoyle",
+                "Giant",
+                "Goblin",
+                "God",
+                "Grummite",
+                "Harpy",
+                "High Elf",
+                "Imp",
+                "Imperfect",
+                "Imperial",
+                "Insect",
+                "Khajiit",
+                "Kwama",
+                "Lurcher",
+                "Mammoth",
+                "Mantikora",
+                "Minotaur",
+                "Mudcrab",
+                "Mummy",
+                "Nereid",
+                "Netch",
+                "Nord",
+                "Ogre",
+                "Orc",
+                "Pastry",
+                "Reachman",
+                "Redguard",
+                "Reptile",
+                "Skeever",
+                "Skeleton",
+                "Spider",
+                "Spirit",
+                "Spriggan",
+                "Troll",
+                "Vampire",
+                "Wamasu",
+                "Werewolf",
+                "Wolf",
+                "Wood Elf",
+                "Wraith"
+            ), type = "Creature"
         ).createCard()
-        val creature4 = Card(name = "Skeletal Dragon", subtypes = listOf("Dragon", "Skeleton"), type = "Creature").createCard()
+        val creature4 =
+            Card(name = "Skeletal Dragon", subtypes = listOf("Dragon", "Skeleton"), type = "Creature").createCard()
         val deck1 = Deck(cards = listOf(creature1, creature1, creature2, creature3, creature3, creature4))
         assertThat(DeckAnalysis(deck1).isUndead()).isTrue()
 
@@ -110,7 +190,8 @@ class DeckAnalysisTest {
         assertThat(DeckAnalysis(deck2).isUndead()).isTrue()
 
         val creature6 = Card(name = "Some other khajiit", subtypes = listOf("Khajiit"), type = "Creature").createCard()
-        val deck3 = Deck(cards = listOf(creature1, creature1, creature2, creature3, creature3, creature4, creature5, creature6))
+        val deck3 =
+            Deck(cards = listOf(creature1, creature1, creature2, creature3, creature3, creature4, creature5, creature6))
         assertThat(DeckAnalysis(deck3).isUndead()).isFalse()
 
     }
@@ -119,8 +200,10 @@ class DeckAnalysisTest {
     fun `cost to cards`() {
         val creature1 = Card(name = "creature 1", subtypes = listOf("Nord"), type = "Creature", cost = 0).createCard()
         val creature2 = Card(name = "creature 2", subtypes = listOf("Nord"), type = "Creature", cost = 0).createCard()
-        val creature3 = Card(name = "creature 3", subtypes = listOf("Factotum"), type = "Creature", cost = 2).createCard()
-        val creature4 = Card(name = "creature 4", subtypes = listOf("Vampire"), type = "Creature", cost = 4).createCard()
+        val creature3 =
+            Card(name = "creature 3", subtypes = listOf("Factotum"), type = "Creature", cost = 2).createCard()
+        val creature4 =
+            Card(name = "creature 4", subtypes = listOf("Vampire"), type = "Creature", cost = 4).createCard()
         val deck = Deck(cards = listOf(creature1, creature1, creature2, creature3, creature3, creature4))
         val da = DeckAnalysis(deck)
 
@@ -149,12 +232,12 @@ class DeckAnalysisTest {
     fun `Soul gem cost`() {
         val creature1 = Card(name = "creature 1", soulSummon = 100).createCard()
         val creature2 = Card(name = "creature 2", soulSummon = 200).createCard()
-        val creature3 = Card(name = "creature 3", soulSummon = 300).createCard()
+        val creature3 = Card(name = "creature 3", soulSummon = -1).createCard()
         val creature4 = Card(name = "creature 4", soulSummon = 0).createCard()
         val deck = Deck(cards = listOf(creature1, creature1, creature2, creature3, creature3, creature4))
         val da = DeckAnalysis(deck)
 
-        assertThat(da.soulGemCost).isEqualTo(1000)
+        assertThat(da.soulGemCost).isEqualTo(400)
     }
 
     @Test
@@ -183,7 +266,22 @@ class DeckAnalysisTest {
         val creature7 = Card(name = "creature 7", cost = 7).createCard()
         val creature8 = Card(name = "creature 8", cost = 8).createCard()
         val creature9 = Card(name = "creature 9", cost = 9).createCard()
-        val deck = Deck(cards = listOf(creature1a, creature1a, creature1b, creature2a, creature2b, creature3a, creature3a, creature4a, creature7, creature7, creature8, creature9))
+        val deck = Deck(
+            cards = listOf(
+                creature7,
+                creature7,
+                creature8,
+                creature9,
+                creature4a,
+                creature1a,
+                creature1a,
+                creature1b,
+                creature2a,
+                creature2b,
+                creature3a,
+                creature3a
+            )
+        )
         val da = DeckAnalysis(deck)
 
         // Actual costs
@@ -262,7 +360,13 @@ class DeckAnalysisTest {
         val c9 = Card(name = "9").createCard()
         val deck = Deck(cards = listOf(c1, c1, c2, c2, c3, c4, c5, c5, c6, c7, c8, c9))
 
-        assertThat(DeckAnalysis(deck).attributes).containsExactlyEntriesOf(mapOf("Strength" to 6, "Agility" to 5, "Intelligence" to 5))
+        assertThat(DeckAnalysis(deck).attributes).containsExactlyEntriesOf(
+            mapOf(
+                "Strength" to 6,
+                "Agility" to 5,
+                "Intelligence" to 5
+            )
+        )
     }
 
     @Test
@@ -308,20 +412,111 @@ class DeckAnalysisTest {
         assertThat(DeckAnalysis(Deck(cards = listOf(cPurple, cRed))).deckClass).isEqualTo(DeckClass.WARRIOR)
 
         assertThat(DeckAnalysis(Deck(cards = listOf(cGreen, cBlue, cRed))).deckClass).isEqualTo(DeckClass.HOUSE_DAGOTH)
-        assertThat(DeckAnalysis(Deck(cards = listOf(cRed, cYellow, cGreen))).deckClass).isEqualTo(DeckClass.HOUSE_HLAALU)
-        assertThat(DeckAnalysis(Deck(cards = listOf(cRed, cYellow, cPurple))).deckClass).isEqualTo(DeckClass.HOUSE_REDORAN)
-        assertThat(DeckAnalysis(Deck(cards = listOf(cBlue, cGreen, cPurple))).deckClass).isEqualTo(DeckClass.HOUSE_TELVANNI)
-        assertThat(DeckAnalysis(Deck(cards = listOf(cBlue, cYellow, cPurple))).deckClass).isEqualTo(DeckClass.TRIBUNAL_TEMPLE)
+        assertThat(
+            DeckAnalysis(
+                Deck(
+                    cards = listOf(
+                        cRed,
+                        cYellow,
+                        cGreen
+                    )
+                )
+            ).deckClass
+        ).isEqualTo(DeckClass.HOUSE_HLAALU)
+        assertThat(
+            DeckAnalysis(
+                Deck(
+                    cards = listOf(
+                        cRed,
+                        cYellow,
+                        cPurple
+                    )
+                )
+            ).deckClass
+        ).isEqualTo(DeckClass.HOUSE_REDORAN)
+        assertThat(
+            DeckAnalysis(
+                Deck(
+                    cards = listOf(
+                        cBlue,
+                        cGreen,
+                        cPurple
+                    )
+                )
+            ).deckClass
+        ).isEqualTo(DeckClass.HOUSE_TELVANNI)
+        assertThat(
+            DeckAnalysis(
+                Deck(
+                    cards = listOf(
+                        cBlue,
+                        cYellow,
+                        cPurple
+                    )
+                )
+            ).deckClass
+        ).isEqualTo(DeckClass.TRIBUNAL_TEMPLE)
 
-        assertThat(DeckAnalysis(Deck(cards = listOf(cBlue, cYellow, cGreen))).deckClass).isEqualTo(DeckClass.ALDEMERI_DOMINION)
-        assertThat(DeckAnalysis(Deck(cards = listOf(cPurple, cRed, cBlue))).deckClass).isEqualTo(DeckClass.DAGGERFALL_COVENANT)
-        assertThat(DeckAnalysis(Deck(cards = listOf(cGreen, cPurple, cRed))).deckClass).isEqualTo(DeckClass.EBONHEART_PACT)
-        assertThat(DeckAnalysis(Deck(cards = listOf(cYellow, cGreen, cPurple))).deckClass).isEqualTo(DeckClass.EMPIRE_OF_CYRODIIL)
+        assertThat(
+            DeckAnalysis(
+                Deck(
+                    cards = listOf(
+                        cBlue,
+                        cYellow,
+                        cGreen
+                    )
+                )
+            ).deckClass
+        ).isEqualTo(DeckClass.ALDEMERI_DOMINION)
+        assertThat(
+            DeckAnalysis(
+                Deck(
+                    cards = listOf(
+                        cPurple,
+                        cRed,
+                        cBlue
+                    )
+                )
+            ).deckClass
+        ).isEqualTo(DeckClass.DAGGERFALL_COVENANT)
+        assertThat(
+            DeckAnalysis(
+                Deck(
+                    cards = listOf(
+                        cGreen,
+                        cPurple,
+                        cRed
+                    )
+                )
+            ).deckClass
+        ).isEqualTo(DeckClass.EBONHEART_PACT)
+        assertThat(
+            DeckAnalysis(
+                Deck(
+                    cards = listOf(
+                        cYellow,
+                        cGreen,
+                        cPurple
+                    )
+                )
+            ).deckClass
+        ).isEqualTo(DeckClass.EMPIRE_OF_CYRODIIL)
         assertThat(DeckAnalysis(Deck(cards = listOf(cRed, cBlue, cYellow))).deckClass).isEqualTo(DeckClass.GUILDSWORN)
 
         // different order, with neutral
         assertThat(DeckAnalysis(Deck(cards = listOf(cRed, cGreen, cGray))).deckClass).isEqualTo(DeckClass.ARCHER)
-        assertThat(DeckAnalysis(Deck(cards = listOf(cBlue, cRed, cGray, cYellow))).deckClass).isEqualTo(DeckClass.GUILDSWORN)
+        assertThat(
+            DeckAnalysis(
+                Deck(
+                    cards = listOf(
+                        cBlue,
+                        cRed,
+                        cGray,
+                        cYellow
+                    )
+                )
+            ).deckClass
+        ).isEqualTo(DeckClass.GUILDSWORN)
 
     }
 

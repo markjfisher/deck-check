@@ -66,8 +66,14 @@ class DeckImageTest {
         val singletonDeck = Deck.importCode("SPCXaJbqwbigutkPnFrPohlacdtDvUlxlkuCqovZgOkCdcwOeibnqpferfrtjWfyhLejuxqnereAkAaAjtuGqtdVkudtijmmaMbNpaiyiFlifBnbkrcUcOaPpewDtqpRkZkboMgDxcfmgTkojXbDlwehmdAAAA")
 
         // DO IT
-        val image = DeckImage.from(tripleCardDeck, "fenrock")
-        ImageIO.write(image, "PNG", File("./sandbox/out.png"))
+        var image = DeckImage.from(multiCardDeck, "fenrock")
+        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/multi.png"))
+
+        image = DeckImage.from(tripleCardDeck, "fenrock")
+        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/triple.png"))
+
+        image = DeckImage.from(singletonDeck, "fenrock is a really long name yes")
+        ImageIO.write(image, "PNG", File("/home/markf/dev/personal/gaming/deck-check/sandbox/singleton.png"))
 
     }
 

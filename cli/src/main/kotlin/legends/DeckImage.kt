@@ -6,6 +6,7 @@ import tesl.model.Card
 import tesl.model.Deck
 import java.awt.*
 import java.awt.geom.AffineTransform
+import java.awt.geom.RoundRectangle2D
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
 import java.io.IOException
@@ -15,18 +16,36 @@ import kotlin.math.min
 
 object DeckImage {
     private const val fontName = "FreeSans"
-    private const val numCols = 5
+    private const val numCols = 7
     private const val circRadius = 25
     private const val nameWidth = 250
     private const val leftMargin = 10
     private const val leftSpace = 10
-    private const val topBlockHeight = 188
-    private const val heightGap = 7
+    private const val topBlockHeight = 320
+    private const val heightGap = 8
     private const val bottomMargin = 5
-    private const val summaryTitleHeight = 50
     private const val width = 4 * (leftMargin + circRadius*4 + nameWidth) - leftMargin + circRadius - leftSpace
     private const val scaleX: Double = 0.5
     private const val scaleY: Double = 0.5
+    private const val allBoxTop = 5
+    private const val allBoxHeight = topBlockHeight - 15
+    private const val summaryTitleLeft = width * 50 / 100
+    private const val summaryTitleWidth = width * 15 / 100
+    private const val manaBoxLeft = summaryTitleLeft + summaryTitleWidth + 5
+    private const val manaBoxWidth = width - manaBoxLeft - 5
+    private const val mainPanelLeft = 1
+    private const val mainPanelWidth = summaryTitleLeft - 5 - mainPanelLeft
+    private const val classImageLeft = mainPanelWidth / 2 + 58
+    private const val classImageWidth = mainPanelWidth - classImageLeft
+    private const val classTop = topBlockHeight - 120
+    private const val classFontSize = 35
+    private const val numFontSize = 25
+
+    private const val manaFillDark = 0x21a2ff
+    private const val manaFillLight = 0x3fccff
+    private const val manaDarkLine = 0x3169d5
+    private const val manaBoundingBox = 0x16202a
+    private const val manaBackgroundGrey = 0x131516
 
     private val colourLineLight = Color(0x50, 0x4e, 0x36)
     private val colourLineDark = Color(0x39, 0x37, 0x25)
@@ -34,6 +53,7 @@ object DeckImage {
     private val rightCircleHollowResource = this::class.java.classLoader.getResource("images/outer-50.png")
     private val at = AffineTransform.getScaleInstance(scaleX, scaleY)
     private val scaleOp = AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR)
+    private val leftCircle = ImageIO.read(leftCircleFilledResource)
 
     fun from(deck: Deck, username: String): BufferedImage {
         val da = DeckAnalysis(deck)
@@ -53,9 +73,15 @@ object DeckImage {
         ig2.color = Color.BLACK
         ig2.fillRect(0, 0, width, height)
 
-        ig2.color = Color.DARK_GRAY
-        ig2.drawBox(Point(1, 1), Point(width - 1, height - 1))
-        ig2.drawLine(Point(5, topBlockHeight - 5), Point(width - 5, topBlockHeight - 5))
+        // background image for class
+        val classNameGraphic = da.deckClassName.toLowerCase().replace(" ", "_")
+        val classResource = this::class.java.classLoader.getResource("images/class-bg/${classNameGraphic}.png")
+        if (classResource != null) {
+            val classImage = ImageIO.read(classResource)
+            ig2.clipRect(classImageLeft, allBoxTop, classImageWidth, allBoxHeight)
+            ig2.drawImage(classImage, classImageLeft, allBoxTop, null)
+            ig2.clip = null
+        }
 
         cardsInColumns.forEachIndexed { i, list ->
             list.forEachIndexed { j, (count, card) ->
@@ -134,7 +160,6 @@ object DeckImage {
 
                 ig2.clipRect(x1, y-circRadius+2, boxWidth, circRadius*2 - 4)
                 ig2.drawImage(finalImage, x1, y-circRadius+2, null)
-
                 ig2.clip = null
 
                 ////////////////////////////////////////////////////////////////////////////////////
@@ -149,7 +174,6 @@ object DeckImage {
 
                 ////////////////////////////////////////////////////////////////////////////////////
                 // LEFT CIRCLE
-                val leftCircle = ImageIO.read(leftCircleFilledResource)
                 ig2.drawImage(leftCircle, x1 - circRadius, y - circRadius + 1, null)
 
                 // RIGHT OUTER (OR LINE)
@@ -171,15 +195,7 @@ object DeckImage {
                 // LEFT NUMBER = cost
                 ////////////////////////////////////////////////////////////////////////////////////
                 val costMessage = "${card.cost}"
-                ig2.font = Font(fontName, Font.BOLD, 25)
-                val fmCost = ig2.fontMetrics
-                val wCost = fmCost.stringWidth(costMessage)
-                val hCost = fmCost.ascent
-                ig2.paint = Color.BLACK
-                ig2.setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
-                )
+                val (wCost, hCost) = setupToDrawNumber(ig2, costMessage, Color.BLACK)
                 ig2.drawString(costMessage, if (costMessage.length == 1) x1 - 7 else x1 - wCost / 2 - 2, y + hCost / 2 - 1)
 
                 ////////////////////////////////////////////////////////////////////////////////////
@@ -187,10 +203,7 @@ object DeckImage {
                 ////////////////////////////////////////////////////////////////////////////////////
                 if (count > 1) {
                     val countMessage = "$count"
-                    val fmCount = ig2.fontMetrics
-                    val wCount = fmCount.stringWidth(countMessage)
-                    val hCount = fmCount.ascent
-                    ig2.paint = Color.WHITE
+                    val (wCount, hCount) = setupToDrawNumber(ig2, countMessage, Color.WHITE)
                     ig2.drawString(countMessage, x2 + wCount / 2 - 14, y + hCount / 2 - 1)
                 }
 
@@ -198,14 +211,7 @@ object DeckImage {
                 // NAME
                 ////////////////////////////////////////////////////////////////////////////////////
                 val nameMessage = card.name.substring(0, min(card.name.length, 26))
-                ig2.font = Font(fontName, Font.PLAIN, 20)
-                val fmName = ig2.fontMetrics
-                val hName = fmName.ascent
-                ig2.paint = Color.WHITE
-                ig2.setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
-                )
+                val (_, hName) = setupToDrawNumber(ig2, nameMessage, Color.WHITE, Font.PLAIN, 20)
                 ig2.drawString(nameMessage, x1 + 22 + circRadius/2, y + hName / 2 - 2)
             }
         }
@@ -215,18 +221,20 @@ object DeckImage {
         // Summary details
         displayDeckDetailValue(ig2, "Creatures:", "${da.creatureCount}", 0, 0)
         displayDeckDetailValue(ig2, "Soulgems:", "${da.soulGemCost}", 0, 1)
-        displayDeckDetailValue(ig2, "Count:", "${da.totalCards}", 0, 2)
 
-        displayDeckDetailValue(ig2, "Actions:", "${da.actionsCount}", 1, 0)
-        displayDeckDetailValue(ig2, "Items:", "${da.itemsCount}", 1, 1)
-        displayDeckDetailValue(ig2, "Supports:", "${da.supportsCount}", 1, 2)
-        displayDeckDetailValue(ig2, "Prophecies:", "${da.prophecyCount}", 1, 3)
+        displayDeckDetailValue(ig2, "Actions:", "${da.actionsCount}", 0, 2)
+        displayDeckDetailValue(ig2, "Items:", "${da.itemsCount}", 0, 3)
 
-        displayDeckDetailValue(ig2, "Commons:", "${da.commonCount}", 2, 0)
-        displayDeckDetailValue(ig2, "Rares:", "${da.rareCount}", 2, 1)
-        displayDeckDetailValue(ig2, "Epics:", "${da.epicCount}", 2, 2)
-        displayDeckDetailValue(ig2, "Legendaries:", "${da.legendaryCount}", 2, 3)
+        displayDeckDetailValue(ig2, "Supports:", "${da.supportsCount}", 0, 4)
+        displayDeckDetailValue(ig2, "Prophecies:", "${da.prophecyCount}", 0, 5)
 
+        displayDeckDetailValue(ig2, "Commons:", "${da.commonCount}", 0, 6)
+        displayDeckDetailValue(ig2, "Rares:", "${da.rareCount}", 0, 7)
+
+        displayDeckDetailValue(ig2, "Epics:", "${da.epicCount}", 0, 8)
+        displayDeckDetailValue(ig2, "Legendaries:", "${da.legendaryCount}", 0, 9)
+
+        ///////////////////////////////////////////////////////////////////////////////
         // DECK CLASS
         // First get the abilities into the correct order as per the class colour order
         val attr = da.deckClass.classColours.map { DeckAnalysis.ClassAbility.fromColour(it) }.toMutableList()
@@ -241,8 +249,8 @@ object DeckImage {
         attributeCount.forEach { (attribute, count) ->
             val iconResource = this::class.java.classLoader.getResource("images/${attribute}-50.png")
             val iconImage = ImageIO.read(iconResource)
-            val x = 10 + attIndex++ * 108
-            val y = topBlockHeight - 60
+            val x = 10 + attIndex++ * 100
+            val y = classTop
             ig2.drawImage(iconImage, x, y, null)
 
             ig2.paint = Color(0xd2, 0xcb, 0xfe)
@@ -251,12 +259,98 @@ object DeckImage {
 
         // Deck class name
         if (da.totalCards > 0) {
-            ig2.font = Font(fontName, Font.PLAIN, 28)
+            ig2.font = Font(fontName, Font.PLAIN, classFontSize * 8 / 10)
             ig2.paint = Color(0xd2, 0xcb, 0xfe)
-            ig2.drawString("(${da.deckClassName})", attIndex * 108 - 2, topBlockHeight - 26)
+            val ofCount = if (da.deckClass.classColours.size < 3) 50 else 75
+            ig2.drawString("${da.deckClassName} [${da.totalCards} / $ofCount]", leftMargin, classTop + circRadius * 2 + classFontSize + 10)
         }
 
+        ///////////////////////////////////////////////////////////////////////////////
+        // MANA CURVE
+
+        ig2.color = Color(manaBackgroundGrey, false)
+        ig2.fillRect(manaBoxLeft + 1, allBoxTop + 1, manaBoxWidth - 1, allBoxHeight - 1)
+
+        val largestManaCount = da.manaCurve.values.max() ?: 0
+        // draw the 8 circles
+        (0..7).forEach { index ->
+            val x = manaBoxLeft + index * (manaBoxWidth / 8) + manaBoxWidth / 16 - circRadius + 2
+            val y = allBoxHeight - circRadius * 2
+            ig2.drawImage(leftCircle, x, y, null)
+
+            val manaNum = when(index) {
+                0, 1, 2, 3, 4, 5, 6 -> "$index"
+                else -> "7+"
+            }
+
+            val (wCost, hCost) = setupToDrawNumber(ig2, manaNum, Color.BLACK)
+            val numX = if (manaNum.length == 1) x + circRadius - 7 else x - wCost / 2 + circRadius
+            val numY = y + hCost / 2 - 1 + circRadius
+            ig2.drawString(manaNum, numX, numY)
+
+            // draw outline box above the number
+            ig2.color = Color(manaBoundingBox, false)
+            ig2.drawBox(Point(x, allBoxTop + 5), Point(x + circRadius * 2, allBoxHeight - circRadius * 2 - 10))
+            ig2.color = Color.BLACK
+            ig2.fillRect(x+1, allBoxTop + 6, circRadius * 2 - 2, allBoxHeight - allBoxTop - circRadius * 2 - 15 - 2)
+
+            val boxHeight = (allBoxHeight - allBoxTop) - circRadius * 2 - 15 - 2
+            val boxWidth = circRadius * 2 - 2
+            val h1 = da.manaCurve[index] ?: 0
+            if (h1 > 0 && largestManaCount > 0) {
+                val drawHeight = h1 * boxHeight / largestManaCount - 1
+                val boxYFrom = allBoxTop + boxHeight - drawHeight + 5
+                val boxYTo = allBoxTop + boxHeight + 6
+
+                val blueBlock = GfxFade.createColourFade(
+                    colours = listOf(Color(manaFillDark, false), Color(manaFillLight, false)),
+                    width = circRadius * 2 - 1,
+                    height = boxYTo - boxYFrom + 1,
+                    mergePercent = 0.49f,
+                    px1 = (circRadius * 2 - 1) / 2,
+                    py1 = 0,
+                    px2 = (circRadius * 2 - 1) / 2,
+                    py2 = boxYTo - boxYFrom
+                )
+                ig2.drawImage(blueBlock, x + 1, boxYFrom, null)
+
+                // now a small inner border
+                ig2.color = Color(manaDarkLine, false)
+                ig2.drawBox(Point(x + 2, boxYFrom + 1), Point(x + circRadius * 2 - 2, boxYTo - 1))
+
+            }
+            // the actual count
+            val countOfCurrentMana = "$h1"
+            val (wManaCount, hManaCount) = setupToDrawNumber(ig2, countOfCurrentMana, Color.WHITE)
+            ig2.drawString(countOfCurrentMana, x - wManaCount/2 + 25, allBoxTop + 32)
+        }
+
+        // PANEL BOXES
+        ig2.color = Color.DARK_GRAY
+        ig2.drawRect(mainPanelLeft, allBoxTop, mainPanelWidth, allBoxHeight)
+        ig2.drawRect(summaryTitleLeft, allBoxTop, summaryTitleWidth, allBoxHeight)
+        ig2.drawRect(manaBoxLeft, allBoxTop, manaBoxWidth, allBoxHeight)
+
         return bi
+    }
+
+    private fun setupToDrawNumber(
+        ig2: Graphics2D,
+        s: String,
+        colour: Color,
+        style: Int = Font.BOLD,
+        fontSize: Int = numFontSize
+    ): Pair<Int, Int> {
+        ig2.font = Font(fontName, style, fontSize)
+        val cost = ig2.fontMetrics
+        val wCost = cost.stringWidth(s)
+        val hCost = cost.ascent
+        ig2.paint = colour
+        ig2.setRenderingHint(
+            RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+        )
+        return Pair(wCost, hCost)
     }
 
     private fun copySubImage(image: BufferedImage, x: Int, y: Int, w: Int, h: Int): BufferedImage {
@@ -305,8 +399,7 @@ object DeckImage {
     }
 
     private fun displayDeckDetailValue(g: Graphics2D, title: String, text: String, x: Int, y: Int) {
-        val fontSize = 30
-        val xAdj = x + 2
+        val fontSize = 20
 
         // Title
         g.font = Font(fontName, Font.PLAIN, fontSize)
@@ -314,15 +407,16 @@ object DeckImage {
         val wTitle = fmTitle.stringWidth(title)
         val hTitle = fmTitle.ascent
         g.paint = Color(0x86, 0x86, 0x86)
-        g.drawString(title, xAdj*width/numCols + (width/numCols)*7/10 - wTitle - 10, hTitle + y * (fontSize + 15) + summaryTitleHeight - 45)
+        val x2 = x * width / numCols + (width / numCols) * 7 / 10 - wTitle - 10 + summaryTitleLeft
+        val y2 = hTitle + y * (fontSize * 3 / 2) + allBoxTop + 5
+        g.drawString(title, x2, y2)
 
         // Text
         g.font = Font(fontName, Font.BOLD, fontSize)
         val fmText = g.fontMetrics
-        val wText = fmText.stringWidth(text)
-        val hText = fmText.ascent
         g.paint = Color(0xd2, 0xcb, 0xfe)
-        g.drawString(text, xAdj*width/numCols + (width/numCols)*7/10 + 10, hText + y * (fontSize + 15) + summaryTitleHeight - 45)
+        val x3 = x2 + wTitle + 10
+        g.drawString(text, x3, y2)
 
     }
 

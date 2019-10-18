@@ -130,7 +130,7 @@ class DeckAnalysis(private val deck: Deck) {
             }
             .toMap()
 
-        manaCurve = (0..30).fold(mutableMapOf(), { acc, cost ->
+        manaCurve = (0..50).fold(mutableMapOf(), { acc, cost ->
             val x = if (cost < 8) cost else 7
             val y = costToCountMap[cost] ?: 0
             val sevenPlus = acc.getOrDefault(7, 0)
@@ -160,12 +160,14 @@ class DeckAnalysis(private val deck: Deck) {
             }
             .toMap()
 
-        soulGemCost = deck.cards.sumBy { it.soulSummon }
+        soulGemCost = deck.cards
+            .filter { it.soulSummon > 0 }
+            .sumBy { it.soulSummon }
 
         // Sorts all the cards by cost, then name, and then groups the same card into a count to give List<CardCount>
         // so that each card is represented only once in the list, but its count is still captured in the ordering
         cardCountSorted = deck.cards
-            .sortedWith(compareBy<Card>{ it.cost }.thenBy { it.name })
+            .sortedWith(compareBy<Card> { it.cost }.thenBy { it.name })
             .groupBy { Pair(it.cost, it.name) }
             .map {
                 CardCount(count = it.value.size, card = it.value.first())

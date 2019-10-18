@@ -88,13 +88,17 @@ object GfxFade {
         width: Int,
         height: Int,
         mergePercent: Float = 0.1f,
-        additionalWidth: Int = 0
+        additionalWidth: Int = 0,
+        px1: Int = width * 3 / 24,
+        py1: Int = 0,
+        px2: Int = width * 21 / 24,
+        py2: Int = height
     ): BufferedImage {
         val createTransitionFloats = createTransitionFloats(colours.size, mergePercent)
         val createColourBoundaryArray = createColourBoundaryArray(colours)
         val gradientPaint = LinearGradientPaint(
-            Point(width * 3 / 24, 0),
-            Point(width * 21 / 24, height),
+            Point(px1, py1),
+            Point(px2, py2),
             createTransitionFloats,
             createColourBoundaryArray
         )
