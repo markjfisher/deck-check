@@ -33,7 +33,7 @@ object DeckImage {
     private const val summaryTitleWidth = width * 15 / 100
     private const val manaBoxLeft = summaryTitleLeft + summaryTitleWidth + 5
     private const val manaBoxWidth = width - manaBoxLeft - 5
-    private const val mainPanelLeft = 1
+    private const val mainPanelLeft = 5
     private const val mainPanelWidth = summaryTitleLeft - 5 - mainPanelLeft
     private const val classImageLeft = mainPanelWidth / 2 + 58
     private const val classImageWidth = mainPanelWidth - classImageLeft
@@ -78,8 +78,8 @@ object DeckImage {
         val classResource = this::class.java.classLoader.getResource("images/class-bg/${classNameGraphic}.png")
         if (classResource != null) {
             val classImage = ImageIO.read(classResource)
-            ig2.clipRect(classImageLeft, allBoxTop, classImageWidth, allBoxHeight)
-            ig2.drawImage(classImage, classImageLeft, allBoxTop, null)
+            ig2.clipRect(classImageLeft + 2, allBoxTop, classImageWidth + 4, allBoxHeight)
+            ig2.drawImage(classImage, classImageLeft + 3, allBoxTop, null)
             ig2.clip = null
         }
 
@@ -249,12 +249,12 @@ object DeckImage {
         attributeCount.forEach { (attribute, count) ->
             val iconResource = this::class.java.classLoader.getResource("images/${attribute}-50.png")
             val iconImage = ImageIO.read(iconResource)
-            val x = 10 + attIndex++ * 100
+            val x = 14 + attIndex++ * 100
             val y = classTop
             ig2.drawImage(iconImage, x, y, null)
 
             ig2.paint = Color(0xd2, 0xcb, 0xfe)
-            ig2.drawString("$count", x + 55, y + 35)
+            ig2.drawString("$count", x + 59, y + 35)
         }
 
         // Deck class name
@@ -262,7 +262,7 @@ object DeckImage {
             ig2.font = Font(fontName, Font.PLAIN, classFontSize * 8 / 10)
             ig2.paint = Color(0xd2, 0xcb, 0xfe)
             val ofCount = if (da.deckClass.classColours.size < 3) 50 else 75
-            ig2.drawString("${da.deckClassName} [${da.totalCards} / $ofCount]", leftMargin, classTop + circRadius * 2 + classFontSize + 10)
+            ig2.drawString("${da.deckClassName} [${da.totalCards} / $ofCount]", leftMargin + 4, classTop + circRadius * 2 + classFontSize + 10)
         }
 
         ///////////////////////////////////////////////////////////////////////////////
@@ -285,7 +285,7 @@ object DeckImage {
 
             val (wCost, hCost) = setupToDrawNumber(ig2, manaNum, Color.BLACK)
             val numX = if (manaNum.length == 1) x + circRadius - 7 else x - wCost / 2 + circRadius
-            val numY = y + hCost / 2 - 1 + circRadius
+            val numY = y + hCost / 2 - 2 + circRadius
             ig2.drawString(manaNum, numX, numY)
 
             // draw outline box above the number
@@ -394,7 +394,7 @@ object DeckImage {
         val fm = g.fontMetrics
         val hName = fm.ascent
         g.paint = Color(0xc6, 0xc6, 0xc6)
-        g.drawString(name, 10, 5 + hName)
+        g.drawString(name, 14, 5 + hName)
         return hName
     }
 
