@@ -160,9 +160,17 @@ class DeckAnalysis(private val deck: Deck) {
             }
             .toMap()
 
-        soulGemCost = deck.cards
-            .filter { it.soulSummon > 0 }
-            .sumBy { it.soulSummon }
+        // Use rarity for calculations, as some cards appear to be 0 cost from collections.
+        soulGemCost = deck.cards.fold(0) { acc, card ->
+            val cost = when (card.rarity) {
+                "Legendary" -> 1200
+                "Epic" -> 400
+                "Rare" -> 100
+                "Common" -> 50
+                else -> 0
+            }
+            acc + cost
+        }
 
         // Sorts all the cards by cost, then name, and then groups the same card into a count to give List<CardCount>
         // so that each card is represented only once in the list, but its count is still captured in the ordering

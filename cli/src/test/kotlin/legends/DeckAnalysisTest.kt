@@ -230,14 +230,15 @@ class DeckAnalysisTest {
 
     @Test
     fun `Soul gem cost`() {
-        val creature1 = Card(name = "creature 1", soulSummon = 100).createCard()
-        val creature2 = Card(name = "creature 2", soulSummon = 200).createCard()
-        val creature3 = Card(name = "creature 3", soulSummon = -1).createCard()
-        val creature4 = Card(name = "creature 4", soulSummon = 0).createCard()
-        val deck = Deck(cards = listOf(creature1, creature1, creature2, creature3, creature3, creature4))
+        val creature1 = Card(name = "creature 1", soulSummon = 1200, rarity = "Legendary").createCard()
+        val creature2 = Card(name = "creature 2", soulSummon = 200, rarity = "Epic").createCard()
+        val creature3 = Card(name = "creature 3", soulSummon = -1, rarity = "Epic").createCard()
+        val creature4 = Card(name = "creature 4", soulSummon = 0, rarity = "Rare").createCard()
+        val creature5 = Card(name = "creature 4", soulSummon = 0, rarity = "Common").createCard()
+        val deck = Deck(cards = listOf(creature1, creature1, creature2, creature3, creature3, creature4, creature5))
         val da = DeckAnalysis(deck)
 
-        assertThat(da.soulGemCost).isEqualTo(400)
+        assertThat(da.soulGemCost).isEqualTo(3750)
     }
 
     @Test
