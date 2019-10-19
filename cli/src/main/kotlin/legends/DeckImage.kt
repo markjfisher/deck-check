@@ -6,7 +6,6 @@ import tesl.model.Card
 import tesl.model.Deck
 import java.awt.*
 import java.awt.geom.AffineTransform
-import java.awt.geom.RoundRectangle2D
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
 import java.io.IOException
@@ -15,37 +14,37 @@ import javax.imageio.ImageIO
 import kotlin.math.min
 
 object DeckImage {
-    private const val fontName = "FreeSans"
-    private const val numCols = 7
-    private const val circRadius = 25
-    private const val nameWidth = 250
-    private const val leftMargin = 10
-    private const val leftSpace = 10
-    private const val topBlockHeight = 320
-    private const val heightGap = 8
-    private const val bottomMargin = 5
-    private const val width = 4 * (leftMargin + circRadius*4 + nameWidth) - leftMargin + circRadius - leftSpace
-    private const val scaleX: Double = 0.5
-    private const val scaleY: Double = 0.5
-    private const val allBoxTop = 5
-    private const val allBoxHeight = topBlockHeight - 15
-    private const val summaryTitleLeft = width * 50 / 100
-    private const val summaryTitleWidth = width * 15 / 100
-    private const val manaBoxLeft = summaryTitleLeft + summaryTitleWidth + 5
-    private const val manaBoxWidth = width - manaBoxLeft - 5
-    private const val mainPanelLeft = 5
-    private const val mainPanelWidth = summaryTitleLeft - 5 - mainPanelLeft
-    private const val classImageLeft = mainPanelWidth / 2 + 58
-    private const val classImageWidth = mainPanelWidth - classImageLeft
-    private const val classTop = topBlockHeight - 120
-    private const val classFontSize = 35
-    private const val numFontSize = 25
+    const val fontName = "FreeSans"
+    const val numCols = 7
+    const val circRadius = 25
+    const val nameWidth = 250
+    const val leftMargin = 10
+    const val leftSpace = 10
+    const val topBlockHeight = 320
+    const val heightGap = 8
+    const val bottomMargin = 5
+    const val width = 4 * (leftMargin + circRadius*4 + nameWidth) - leftMargin + circRadius - leftSpace
+    const val scaleX: Double = 0.5
+    const val scaleY: Double = 0.5
+    const val allBoxTop = 5
+    const val allBoxHeight = topBlockHeight - 15
+    const val summaryTitleLeft = width * 50 / 100
+    const val summaryTitleWidth = width * 15 / 100
+    const val manaBoxLeft = summaryTitleLeft + summaryTitleWidth + 5
+    const val manaBoxWidth = width - manaBoxLeft - 5
+    const val mainPanelLeft = 5
+    const val mainPanelWidth = summaryTitleLeft - 5 - mainPanelLeft
+    const val classImageLeft = mainPanelWidth / 2 + 58
+    const val classImageWidth = mainPanelWidth - classImageLeft
+    const val classTop = topBlockHeight - 120
+    const val classFontSize = 35
+    const val numFontSize = 25
 
-    private const val manaFillDark = 0x21a2ff
-    private const val manaFillLight = 0x3fccff
-    private const val manaDarkLine = 0x3169d5
-    private const val manaBoundingBox = 0x16202a
-    private const val manaBackgroundGrey = 0x131516
+    const val manaFillDark = 0x21a2ff
+    const val manaFillLight = 0x3fccff
+    const val manaDarkLine = 0x3169d5
+    const val manaBoundingBox = 0x16202a
+    const val manaBackgroundGrey = 0x131516
 
     private val colourLineLight = Color(0x50, 0x4e, 0x36)
     private val colourLineDark = Color(0x39, 0x37, 0x25)
@@ -93,73 +92,11 @@ object DeckImage {
                 val x2 = x1 + nameWidth + circRadius*2
                 val y = topBlockHeight + j * (circRadius*2 + heightGap) + circRadius
 
-                ////////////////////////////////////////////////////////////////////////////////////
-                // IMAGES
-                ////////////////////////////////////////////////////////////////////////////////////
-                val imageData = getImageData(card)
-                val cutdownImage = copySubImage(imageData, 60, 140, imageData.width - 130, 110)
-                val scaledImage = scaleImage(cutdownImage)
-
-                // CLOUD on left, CARD on right, dissolve between the two
-
-                // CLOUD
-                val cloudResource = this::class.java.classLoader.getResource("images/cloud-grey.png")
-                val cloudImage = ImageIO.read(cloudResource)
-
-                // Merge
-                val boxHeight = circRadius * 2 - 4
-                val boxWidth = x2 - x1
-                val mergedImage = GfxFade.combine(
-                    image1 = cloudImage,
-                    image2 = scaledImage,
-                    width = boxWidth,
-                    height = boxHeight,
-                    mergePoint = 0.59f,
-                    mergePercent = 0.13f
-                )
-
-                ////////////////////////////////////////////////////////////////////////////////////
-                // FILLED BOX WITH CARD COLOURS
-                // The alpha channel of the colours determine the opacity of the colour
-                val cc = card.attributes
-                    .map { ClassAbility.valueOf(it.toUpperCase()).classColour }
-
-                val colourBoxWidth = boxWidth * 14 / 20
-                val colourOverlay: BufferedImage = when(cc.size) {
-                    1 -> GfxFade.createColourFade(
-                        colours = listOf(cc[0].hexColor, cc[0].hexColor),
-                        width = colourBoxWidth,
-                        height = boxHeight
-                    )
-                    2 -> GfxFade.createColourFade(
-                        colours = listOf(cc[0].hexColor, cc[1].hexColor),
-                        width = colourBoxWidth * 9 / 13,
-                        height = boxHeight,
-                        mergePercent = 0.25f,
-                        additionalWidth =  colourBoxWidth * 4 / 13
-                    )
-                    else -> GfxFade.createColourFade(
-                        colours = listOf(cc[0].hexColor, cc[1].hexColor, cc[2].hexColor),
-                        width = colourBoxWidth * 9 / 13,
-                        height = boxHeight,
-                        mergePercent = 0.2f,
-                        additionalWidth = colourBoxWidth * 4 / 13
-                    )
-                }
-
-                // now combine colourImage and mergedImage
-                val finalImage = GfxFade.combine(
-                    image1 = colourOverlay,
-                    image2 = mergedImage,
-                    width = boxWidth,
-                    height = boxHeight,
-                    mergePoint = 0.45f,
-                    mergePercent = 0.08f,
-                    initialAlpha = 0x7f
-                )
-
-                ig2.clipRect(x1, y-circRadius+2, boxWidth, circRadius*2 - 4)
-                ig2.drawImage(finalImage, x1, y-circRadius+2, null)
+                val fileName = fileNameFromCardName(card.name)
+                val renderedSource = this::class.java.classLoader.getResource("images/rendered/${fileName}.png")
+                val renderedImage = ImageIO.read(renderedSource)
+                ig2.clipRect(x1, y-circRadius+2, nameWidth + circRadius*2, circRadius*2 - 4)
+                ig2.drawImage(renderedImage, x1, y-circRadius+2, null)
                 ig2.clip = null
 
                 ////////////////////////////////////////////////////////////////////////////////////
@@ -211,6 +148,8 @@ object DeckImage {
                 // NAME
                 ////////////////////////////////////////////////////////////////////////////////////
                 val nameMessage = card.name.substring(0, min(card.name.length, 26))
+                val (_, hNameBlack) = setupToDrawNumber(ig2, nameMessage, Color.BLACK, Font.PLAIN, 20)
+                ig2.drawString(nameMessage, x1 + 24 + circRadius/2, y + hNameBlack / 2)
                 val (_, hName) = setupToDrawNumber(ig2, nameMessage, Color.WHITE, Font.PLAIN, 20)
                 ig2.drawString(nameMessage, x1 + 22 + circRadius/2, y + hName / 2 - 2)
             }
@@ -334,6 +273,33 @@ object DeckImage {
         return bi
     }
 
+    fun createColourFade(card: Card, w: Int, h: Int): BufferedImage {
+        val cc = card.attributes
+            .map { ClassAbility.valueOf(it.toUpperCase()).classColour }
+
+        return when (cc.size) {
+            1 -> GfxFade.createColourFade(
+                colours = listOf(cc[0].hexColor, cc[0].hexColor),
+                width = w,
+                height = h
+            )
+            2 -> GfxFade.createColourFade(
+                colours = listOf(cc[0].hexColor, cc[1].hexColor),
+                width = w * 9 / 13,
+                height = h,
+                mergePercent = 0.25f,
+                additionalWidth = w * 4 / 13
+            )
+            else -> GfxFade.createColourFade(
+                colours = listOf(cc[0].hexColor, cc[1].hexColor, cc[2].hexColor),
+                width = w * 9 / 13,
+                height = h,
+                mergePercent = 0.2f,
+                additionalWidth = w * 4 / 13
+            )
+        }
+    }
+
     private fun setupToDrawNumber(
         ig2: Graphics2D,
         s: String,
@@ -353,7 +319,7 @@ object DeckImage {
         return Pair(wCost, hCost)
     }
 
-    private fun copySubImage(image: BufferedImage, x: Int, y: Int, w: Int, h: Int): BufferedImage {
+    fun copySubImage(image: BufferedImage, x: Int, y: Int, w: Int, h: Int): BufferedImage {
         val new = BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
         val g = new.createGraphics()
         g.drawImage(image.getSubimage(x, y, w, h), 0, 0, null)
@@ -361,22 +327,9 @@ object DeckImage {
         return new
     }
 
-    private fun scaleImage(image: BufferedImage): BufferedImage {
+    fun scaleImage(image: BufferedImage): BufferedImage {
         val after = BufferedImage((image.width * scaleX).toInt(), (image.height * scaleY).toInt(), BufferedImage.TYPE_INT_ARGB)
         return scaleOp.filter(image, after)
-    }
-
-    private fun Image.toBufferedImage(): BufferedImage {
-        if (this is BufferedImage) {
-            return this
-        }
-        val bufferedImage = BufferedImage(this.getWidth(null), this.getHeight(null), BufferedImage.TYPE_INT_ARGB)
-
-        val graphics2D = bufferedImage.createGraphics()
-        graphics2D.drawImage(this, 0, 0, null)
-        graphics2D.dispose()
-
-        return bufferedImage
     }
 
     private fun displayUser(g: Graphics2D, name: String): Int {
@@ -420,7 +373,7 @@ object DeckImage {
 
     }
 
-    private fun getImageData(card: Card): BufferedImage {
+    fun getImageData(card: Card): BufferedImage {
         val sanitisedName = card.name.replace("/", "_")
         val localResource = this::class.java.classLoader.getResource("images/cards/${sanitisedName}.png")
         return when {
@@ -439,4 +392,14 @@ object DeckImage {
             total / columnCount + if (i < total % columnCount) 1 else 0
         }
     }
+
+    fun fileNameFromCardName(s: String) = s
+        .toLowerCase()
+        .replace(" ", "_")
+        .replace("/", "_")
+        .replace("'", "")
+        .replace("\"", "")
+        .replace("(", "")
+        .replace(")", "")
+
 }
