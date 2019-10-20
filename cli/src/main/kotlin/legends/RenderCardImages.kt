@@ -41,7 +41,7 @@ class RenderCardImages {
                 image2 = mergedImage,
                 width = boxWidth,
                 height = boxHeight,
-                mergePoint = 0.45f,
+                mergePoint = 0.49f,
                 mergePercent = 0.08f,
                 initialAlpha = 0x7f
             )

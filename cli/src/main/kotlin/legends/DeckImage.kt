@@ -1,10 +1,16 @@
 package legends
 
 import legends.DeckAnalysis.ClassAbility
-import legends.gfx.*
+import legends.gfx.GfxFade
+import legends.gfx.Point
+import legends.gfx.drawBox
+import legends.gfx.drawLine
 import tesl.model.Card
 import tesl.model.Deck
-import java.awt.*
+import java.awt.Color
+import java.awt.Font
+import java.awt.Graphics2D
+import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
@@ -23,7 +29,7 @@ object DeckImage {
     const val topBlockHeight = 320
     const val heightGap = 8
     const val bottomMargin = 5
-    const val width = 4 * (leftMargin + circRadius*4 + nameWidth) - leftMargin + circRadius - leftSpace
+    const val width = 4 * (leftMargin + circRadius * 4 + nameWidth) - leftMargin + circRadius - leftSpace
     const val scaleX: Double = 0.5
     const val scaleY: Double = 0.5
     const val allBoxTop = 5
@@ -88,15 +94,15 @@ object DeckImage {
                     RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON
                 )
-                val x1 = i * (leftMargin + 4*circRadius + nameWidth) + circRadius + leftSpace
-                val x2 = x1 + nameWidth + circRadius*2
-                val y = topBlockHeight + j * (circRadius*2 + heightGap) + circRadius
+                val x1 = i * (leftMargin + 4 * circRadius + nameWidth) + circRadius + leftSpace
+                val x2 = x1 + nameWidth + circRadius * 2
+                val y = topBlockHeight + j * (circRadius * 2 + heightGap) + circRadius
 
                 val fileName = fileNameFromCardName(card.name)
                 val renderedSource = this::class.java.classLoader.getResource("images/rendered/${fileName}.png")
                 val renderedImage = ImageIO.read(renderedSource)
-                ig2.clipRect(x1, y-circRadius+2, nameWidth + circRadius*2, circRadius*2 - 4)
-                ig2.drawImage(renderedImage, x1, y-circRadius+2, null)
+                ig2.clipRect(x1, y - circRadius + 2, nameWidth + circRadius * 2, circRadius * 2 - 4)
+                ig2.drawImage(renderedImage, x1, y - circRadius + 2, null)
                 ig2.clip = null
 
                 ////////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +139,11 @@ object DeckImage {
                 ////////////////////////////////////////////////////////////////////////////////////
                 val costMessage = "${card.cost}"
                 val (wCost, hCost) = setupToDrawNumber(ig2, costMessage, Color.BLACK)
-                ig2.drawString(costMessage, if (costMessage.length == 1) x1 - 7 else x1 - wCost / 2 - 2, y + hCost / 2 - 1)
+                ig2.drawString(
+                    costMessage,
+                    if (costMessage.length == 1) x1 - 7 else x1 - wCost / 2 - 2,
+                    y + hCost / 2 - 1
+                )
 
                 ////////////////////////////////////////////////////////////////////////////////////
                 // RIGHT NUMBER = COUNT (if > 1)
@@ -149,9 +159,9 @@ object DeckImage {
                 ////////////////////////////////////////////////////////////////////////////////////
                 val nameMessage = card.name.substring(0, min(card.name.length, 26))
                 val (_, hNameBlack) = setupToDrawNumber(ig2, nameMessage, Color.BLACK, Font.PLAIN, 20)
-                ig2.drawString(nameMessage, x1 + 24 + circRadius/2, y + hNameBlack / 2)
+                ig2.drawString(nameMessage, x1 + 24 + circRadius / 2, y + hNameBlack / 2)
                 val (_, hName) = setupToDrawNumber(ig2, nameMessage, Color.WHITE, Font.PLAIN, 20)
-                ig2.drawString(nameMessage, x1 + 22 + circRadius/2, y + hName / 2 - 2)
+                ig2.drawString(nameMessage, x1 + 22 + circRadius / 2, y + hName / 2 - 2)
             }
         }
 
@@ -201,7 +211,11 @@ object DeckImage {
             ig2.font = Font(fontName, Font.PLAIN, classFontSize * 8 / 10)
             ig2.paint = Color(0xd2, 0xcb, 0xfe)
             val ofCount = if (da.deckClass.classColours.size < 3) 50 else 75
-            ig2.drawString("${da.deckClassName} [${da.totalCards} / $ofCount]", leftMargin + 4, classTop + circRadius * 2 + classFontSize + 10)
+            ig2.drawString(
+                "${da.deckClassName} [${da.totalCards} / $ofCount]",
+                leftMargin + 4,
+                classTop + circRadius * 2 + classFontSize + 10
+            )
         }
 
         ///////////////////////////////////////////////////////////////////////////////
@@ -217,7 +231,7 @@ object DeckImage {
             val y = allBoxHeight - circRadius * 2
             ig2.drawImage(leftCircle, x, y, null)
 
-            val manaNum = when(index) {
+            val manaNum = when (index) {
                 0, 1, 2, 3, 4, 5, 6 -> "$index"
                 else -> "7+"
             }
@@ -231,7 +245,7 @@ object DeckImage {
             ig2.color = Color(manaBoundingBox, false)
             ig2.drawBox(Point(x, allBoxTop + 5), Point(x + circRadius * 2, allBoxHeight - circRadius * 2 - 10))
             ig2.color = Color.BLACK
-            ig2.fillRect(x+1, allBoxTop + 6, circRadius * 2 - 2, allBoxHeight - allBoxTop - circRadius * 2 - 15 - 2)
+            ig2.fillRect(x + 1, allBoxTop + 6, circRadius * 2 - 2, allBoxHeight - allBoxTop - circRadius * 2 - 15 - 2)
 
             val boxHeight = (allBoxHeight - allBoxTop) - circRadius * 2 - 15 - 2
             val boxWidth = circRadius * 2 - 2
@@ -261,7 +275,7 @@ object DeckImage {
             // the actual count
             val countOfCurrentMana = "$h1"
             val (wManaCount, hManaCount) = setupToDrawNumber(ig2, countOfCurrentMana, Color.WHITE)
-            ig2.drawString(countOfCurrentMana, x - wManaCount/2 + 25, allBoxTop + 32)
+            ig2.drawString(countOfCurrentMana, x - wManaCount / 2 + 25, allBoxTop + 32)
         }
 
         // PANEL BOXES
@@ -328,7 +342,8 @@ object DeckImage {
     }
 
     fun scaleImage(image: BufferedImage): BufferedImage {
-        val after = BufferedImage((image.width * scaleX).toInt(), (image.height * scaleY).toInt(), BufferedImage.TYPE_INT_ARGB)
+        val after =
+            BufferedImage((image.width * scaleX).toInt(), (image.height * scaleY).toInt(), BufferedImage.TYPE_INT_ARGB)
         return scaleOp.filter(image, after)
     }
 
@@ -381,6 +396,7 @@ object DeckImage {
                 ImageIO.read(localResource)
             }
             card.imageUrl != "" -> {
+                println("Downloading ${card.imageUrl}")
                 ImageIO.read(URL(card.imageUrl))
             }
             else -> throw IOException("No URL available for card $card")
@@ -393,13 +409,24 @@ object DeckImage {
         }
     }
 
-    fun fileNameFromCardName(s: String) = s
-        .toLowerCase()
-        .replace(" ", "_")
-        .replace("/", "_")
-        .replace("'", "")
-        .replace("\"", "")
-        .replace("(", "")
-        .replace(")", "")
+    fun fileNameFromCardName(s: String): String {
+        var x = s
+            .replace("/", "_")
+            .replace(" ", "_")
+            .replace(",", "_")
+            .replace("'", "")
+            .replace("\"", "")
+            .replace("?", "")
+            .replace(")", "")
+            .replace("(", "")
+            .toLowerCase()
+        var xLen = 0
+        while (x.length != xLen) {
+            xLen = x.length
+            x = x.replace("__", "_")
+        }
+        return x
+
+    }
 
 }
