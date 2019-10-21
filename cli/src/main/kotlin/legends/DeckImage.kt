@@ -30,8 +30,6 @@ object DeckImage {
     const val heightGap = 8
     const val bottomMargin = 5
     const val width = 4 * (leftMargin + circRadius * 4 + nameWidth) - leftMargin + circRadius - leftSpace
-    const val scaleX: Double = 0.5
-    const val scaleY: Double = 0.5
     const val allBoxTop = 5
     const val allBoxHeight = topBlockHeight - 15
     const val summaryTitleLeft = width * 50 / 100
@@ -56,8 +54,6 @@ object DeckImage {
     private val colourLineDark = Color(0x39, 0x37, 0x25)
     private val leftCircleFilledResource = this::class.java.classLoader.getResource("images/outer-blue-50.png")
     private val rightCircleHollowResource = this::class.java.classLoader.getResource("images/outer-50.png")
-    private val at = AffineTransform.getScaleInstance(scaleX, scaleY)
-    private val scaleOp = AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR)
     private val leftCircle = ImageIO.read(leftCircleFilledResource)
 
     fun from(deck: Deck, username: String): BufferedImage {
@@ -287,32 +283,6 @@ object DeckImage {
         return bi
     }
 
-    fun createColourFade(card: Card, w: Int, h: Int): BufferedImage {
-        val cc = card.attributes
-            .map { ClassAbility.valueOf(it.toUpperCase()).classColour }
-
-        return when (cc.size) {
-            1 -> GfxFade.createColourFade(
-                colours = listOf(cc[0].hexColor, cc[0].hexColor),
-                width = w,
-                height = h
-            )
-            2 -> GfxFade.createColourFade(
-                colours = listOf(cc[0].hexColor, cc[1].hexColor),
-                width = w * 9 / 13,
-                height = h,
-                mergePercent = 0.25f,
-                additionalWidth = w * 4 / 13
-            )
-            else -> GfxFade.createColourFade(
-                colours = listOf(cc[0].hexColor, cc[1].hexColor, cc[2].hexColor),
-                width = w * 9 / 13,
-                height = h,
-                mergePercent = 0.2f,
-                additionalWidth = w * 4 / 13
-            )
-        }
-    }
 
     private fun setupToDrawNumber(
         ig2: Graphics2D,
@@ -331,20 +301,6 @@ object DeckImage {
             RenderingHints.VALUE_TEXT_ANTIALIAS_ON
         )
         return Pair(wCost, hCost)
-    }
-
-    fun copySubImage(image: BufferedImage, x: Int, y: Int, w: Int, h: Int): BufferedImage {
-        val new = BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
-        val g = new.createGraphics()
-        g.drawImage(image.getSubimage(x, y, w, h), 0, 0, null)
-        g.dispose()
-        return new
-    }
-
-    fun scaleImage(image: BufferedImage): BufferedImage {
-        val after =
-            BufferedImage((image.width * scaleX).toInt(), (image.height * scaleY).toInt(), BufferedImage.TYPE_INT_ARGB)
-        return scaleOp.filter(image, after)
     }
 
     private fun displayUser(g: Graphics2D, name: String): Int {
@@ -386,21 +342,6 @@ object DeckImage {
         val x3 = x2 + wTitle + 10
         g.drawString(text, x3, y2)
 
-    }
-
-    fun getImageData(card: Card): BufferedImage {
-        val sanitisedName = card.name.replace("/", "_")
-        val localResource = this::class.java.classLoader.getResource("images/cards/${sanitisedName}.png")
-        return when {
-            localResource != null -> {
-                ImageIO.read(localResource)
-            }
-            card.imageUrl != "" -> {
-                println("Downloading ${card.imageUrl}")
-                ImageIO.read(URL(card.imageUrl))
-            }
-            else -> throw IOException("No URL available for card $card")
-        }
     }
 
     fun calculateColumnLengths(total: Int, columnCount: Int): List<Int> {

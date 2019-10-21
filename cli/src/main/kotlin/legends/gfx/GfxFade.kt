@@ -53,7 +53,7 @@ object GfxFade {
         return combine(bi1, bi2)
     }
 
-    private fun combine(image1: BufferedImage, image2: BufferedImage): BufferedImage {
+    fun combine(image1: BufferedImage, image2: BufferedImage): BufferedImage {
         val width = max(image1.width, image2.width)
         val height = max(image1.height, image2.height)
 
@@ -116,10 +116,18 @@ object GfxFade {
         // we have (n-1)*2 middle points to add, and top and tail with 0/1
         val floats = mutableListOf<Float>()
         floats.add(0.0f)
-        (0 until n-1).forEach { i ->
-            val f = (i + 1).toFloat() / n.toFloat()
-            floats.add(f - mergePercent / 2.0f)
-            floats.add(f + mergePercent / 4.0f)
+
+        when (n) {
+            2 -> {
+                floats.add(0.5f - mergePercent/2.0f)
+                floats.add(0.5f + mergePercent/2.0f)
+            }
+            3 -> {
+                floats.add(0.280f - mergePercent / 2.0f)
+                floats.add(0.280f + mergePercent / 4.0f)
+                floats.add(0.666f - mergePercent / 2.0f)
+                floats.add(0.666f + mergePercent / 4.0f)
+            }
         }
         floats.add(1.0f)
         return floats.toFloatArray()

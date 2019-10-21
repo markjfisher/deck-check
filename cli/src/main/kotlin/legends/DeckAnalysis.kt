@@ -263,12 +263,12 @@ class DeckAnalysis(private val deck: Deck) {
     }
 
     enum class ClassColour(val hexColor: Color) {
-        GREEN(Color(0x00, 0x80, 0x00, colourAlpha)),
-        RED(Color(0xff, 0x00, 0x00, colourAlpha)),
-        BLUE(Color(0x00, 0x00, 0xff, colourAlpha)),
-        YELLOW(Color(0xff, 0xff, 0x00, colourAlpha)),
+        GREEN(Color(0x1f, 0x58, 0x1f, colourAlpha)),
+        RED(Color(0xc0, 0x20, 0x20, colourAlpha)),
+        BLUE(Color(0x26, 0x9d, 0xff, colourAlpha)),
+        YELLOW(Color(0xb4, 0xb4, 0x35, colourAlpha)),
         PURPLE(Color(0x80, 0x00, 0x80, colourAlpha)),
-        GREY(Color(0xc0, 0xc0, 0xc0, colourAlpha))
+        GREY(Color(0xa0, 0xa0, 0xa0, colourAlpha))
     }
 
     enum class ClassAbility(val classColour: ClassColour) {
